@@ -1,1 +1,37 @@
-<p>login works!</p>
+<div class="auth-container">
+  <mat-card class="auth-card">
+
+    <!-- Logo -->
+    <div class="brand">
+      <div class="brand-name">FundooNotes</div>
+    </div>
+
+    <div class="auth-title">Login</div>
+    <div class="auth-subtitle">Use your FundooNotes Account</div>
+
+    <form>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Email or phone <span class="required">*</span></mat-label>
+        <input matInput />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Password <span class="required">*</span></mat-label>
+        <input matInput type="password" />
+      </mat-form-field>
+
+      <div class="link-row">
+        <a href="#">Forgot password?</a>
+        <a routerLink="/register">Create account</a>
+      </div>
+
+      <div class="btn-row">
+        <button mat-raised-button color="primary" type="button">
+          Login
+        </button>
+      </div>
+
+    </form>
+  </mat-card>
+</div>
