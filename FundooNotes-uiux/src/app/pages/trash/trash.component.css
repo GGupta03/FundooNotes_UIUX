@@ -1,0 +1,28 @@
+.trash-page {
+  width: 100%;
+  text-align: center;
+  margin-top: 30px;
+}
+
+.trash-info {
+  font-size: 14px;
+  color: #5f6368;
+  margin-bottom: 150px;
+}
+
+.empty-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #5f6368;
+}
+
+.empty-icon {
+  font-size: 90px;
+  opacity: 0.2;
+}
+
+.empty-text {
+  margin-top: 18px;
+  font-size: 24px;
+}
