@@ -1,69 +1,58 @@
 <div class="register-wrapper">
-  <mat-card class="register-card">
 
-    <!-- LEFT SIDE -->
-    <div class="register-left">
+  <div class="register-container">
 
-      <!-- Branding -->
-      <div class="brand register-brand">
-        <img class="brand-logo" src="assets/images/fundoo-logo.png" alt="FundooNotes Logo" />
-        <div class="brand-name">FundooNotes</div>
-      </div>
+    <!-- LEFT -->
+    <div class="left-section">
+
+      <img class="google-logo-img" src="assets/images/google-logo.png" alt="Google Logo" />
 
       <div class="register-title">Create your Google Account</div>
 
-      <!-- FORM -->
-      <form class="register-form">
+      <div class="row">
+        <input class="half-input" type="text" placeholder="First Name*" />
+        <input class="half-input" type="text" placeholder="Last Name*" />
+      </div>
 
-        <div class="row">
-          <mat-form-field appearance="outline" class="half-width">
-            <mat-label>First Name <span class="required">*</span></mat-label>
-            <input matInput />
-          </mat-form-field>
+      <div class="full-row">
+        <input class="full-input" type="text" placeholder="username*" />
+        <div class="small-text">You can use letters, numbers & periods</div>
 
-          <mat-form-field appearance="outline" class="half-width">
-            <mat-label>Last Name <span class="required">*</span></mat-label>
-            <input matInput />
-          </mat-form-field>
-        </div>
-
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Email <span class="required">*</span></mat-label>
-          <input matInput />
-        </mat-form-field>
-
-        <div class="helper-text">You can use letters, numbers & periods</div>
         <a class="link-blue" href="#">Use my current email instead</a>
+      </div>
 
-        <div class="row">
-          <mat-form-field appearance="outline" class="half-width">
-            <mat-label>Password <span class="required">*</span></mat-label>
-            <input matInput type="password" />
-          </mat-form-field>
+      <div class="row">
+        <input class="half-input" type="password" placeholder="Password*" />
+        <input class="half-input" type="password" placeholder="Confirm*" />
+      </div>
 
-          <mat-form-field appearance="outline" class="half-width">
-            <mat-label>Confirm <span class="required">*</span></mat-label>
-            <input matInput type="password" />
-          </mat-form-field>
-        </div>
+      <div class="small-text">
+        Use 8 or more characters with a mix of letters, numbers & symbols
+      </div>
 
-        <div class="helper-text">
-          Use 8 or more characters with a mix of letters, numbers & symbols
-        </div>
+      <div class="checkbox-row">
+        <input type="checkbox" />
+        <span>Show Password</span>
+      </div>
 
-        <mat-checkbox class="show-pass">Show Password</mat-checkbox>
-
-        <!-- Bottom Row -->
-        <div class="bottom-row">
-          <a class="link-blue" routerLink="/login">Sign in instead</a>
-
-          <button mat-raised-button color="primary" type="button">
-            Next
-          </button>
-        </div>
-
-      </form>
+      <div class="bottom-row">
+        <a class="link-blue" routerLink="/login">Sign in instead</a>
+        <button class="next-btn">Next</button>
+      </div>
     </div>
 
-  </mat-card>
+    <!-- RIGHT -->
+    <div class="right-section">
+      <img
+        class="illustration"
+        src="assets/images/google-illustration.png"
+        alt="Google Illustration"
+      />
+
+      <div class="right-text">
+        One account. All of Google working for you.
+      </div>
+    </div>
+
+  </div>
 </div>
