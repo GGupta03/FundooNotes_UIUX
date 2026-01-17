@@ -1,1 +1,85 @@
-<p>dashboard works!</p>
+<div class="keep-layout">
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+
+    <div class="top-left">
+      <button class="circle-btn" type="button">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+
+      <div class="brand">
+        <img class="keep-logo" src="assets/images/keep-logo.png" alt="Keep Logo" />
+        <span class="keep-text">Keep</span>
+      </div>
+    </div>
+
+    <div class="search-container">
+      <span class="material-symbols-outlined search-icon">search</span>
+      <input type="text" placeholder="Search" />
+    </div>
+
+    <div class="top-right">
+      <button class="circle-btn" type="button">
+        <span class="material-symbols-outlined">refresh</span>
+      </button>
+
+      <button class="circle-btn" type="button">
+        <span class="material-symbols-outlined">view_agenda</span>
+      </button>
+
+      <button class="circle-btn" type="button">
+        <span class="material-symbols-outlined">settings</span>
+      </button>
+
+      <button class="circle-btn" type="button">
+        <span class="material-symbols-outlined">apps</span>
+      </button>
+
+      <div class="profile">G</div>
+    </div>
+
+  </header>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+      <a routerLink="/dashboard/notes" routerLinkActive="active" class="side-item">
+        <span class="material-symbols-outlined">lightbulb</span>
+        <span class="label">Notes</span>
+      </a>
+
+      <a routerLink="/dashboard/reminders" routerLinkActive="active" class="side-item">
+        <span class="material-symbols-outlined">notifications</span>
+        <span class="label">Reminders</span>
+      </a>
+
+      <a routerLink="/dashboard/edit-labels" routerLinkActive="active" class="side-item">
+        <span class="material-symbols-outlined">edit</span>
+        <span class="label">Edit labels</span>
+      </a>
+
+      <a routerLink="/dashboard/archive" routerLinkActive="active" class="side-item">
+        <span class="material-symbols-outlined">archive</span>
+        <span class="label">Archive</span>
+      </a>
+
+      <a routerLink="/dashboard/trash" routerLinkActive="active" class="side-item">
+        <span class="material-symbols-outlined">delete</span>
+        <span class="label">Trash</span>
+      </a>
+
+      <div class="bottom-text">Open-source licenses</div>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="content">
+      <router-outlet></router-outlet>
+    </main>
+
+  </div>
+
+</div>
