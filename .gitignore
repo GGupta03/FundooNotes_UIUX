@@ -1,0 +1,57 @@
+# Git
+.git/
+
+# Nested repositories - IMPORTANT: Do not commit backend/database code to UI repo
+FundooNotes/.git/
+FundooNotes-uiux/.git/
+
+# IDE
+.vscode/
+.vs/
+*.code-workspace
+*.suo
+*.user
+*.sln.iml
+
+# Dependencies
+node_modules/
+package-lock.json
+npm-debug.log
+yarn-error.log
+
+# Build outputs
+dist/
+build/
+bin/
+obj/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Angular
+.angular/
+.cache/
+
+# .NET
+*.dll
+*.pdb
+
+# Logs
+logs/
+*.log
+
+# Temporary
+tmp/
+temp/
+*.tmp
+
+# Editor
+*.swp
+*.swo
+*~
