@@ -7,37 +7,89 @@
 
       <img class="google-logo-img" src="assets/images/google-logo.png" alt="Google Logo" />
 
-      <div class="register-title">Create your Google Account</div>
+      <div class="register-title">Create your Account</div>
 
-      <div class="row">
-        <input class="half-input" type="text" placeholder="First Name*" />
-        <input class="half-input" type="text" placeholder="Last Name*" />
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
       </div>
 
-      <div class="full-row">
-        <input class="full-input" type="text" placeholder="username*" />
-        <div class="small-text">You can use letters, numbers & periods</div>
-
-        <a class="link-blue" href="#">Use my current email instead</a>
+      <div *ngIf="successMessage" class="success-message">
+        {{ successMessage }}
       </div>
 
-      <div class="row">
-        <input class="half-input" type="password" placeholder="Password*" />
-        <input class="half-input" type="password" placeholder="Confirm*" />
+      <!-- Registration Form -->
+      <div *ngIf="!showOtpInput">
+        <div class="full-row">
+          <input 
+            class="full-input" 
+            type="text" 
+            placeholder="Full Name*"
+            [(ngModel)]="fullName"
+            [disabled]="isLoading"
+          />
+        </div>
+
+        <div class="full-row">
+          <input 
+            class="full-input" 
+            type="email" 
+            placeholder="Email*"
+            [(ngModel)]="email"
+            [disabled]="isLoading"
+          />
+        </div>
+
+        <div class="row">
+          <input 
+            class="half-input" 
+            type="password" 
+            placeholder="Password*"
+            [(ngModel)]="password"
+            [disabled]="isLoading"
+          />
+          <input 
+            class="half-input" 
+            type="password" 
+            placeholder="Confirm*"
+            [(ngModel)]="confirmPassword"
+            [disabled]="isLoading"
+          />
+        </div>
+
+        <div class="small-text">
+          Use 8 or more characters with a mix of letters, numbers & symbols
+        </div>
+
+        <div class="bottom-row">
+          <a class="link-blue" routerLink="/login" [class.disabled]="isLoading">Sign in instead</a>
+          <button class="next-btn" (click)="onRegister()" [disabled]="isLoading">
+            {{ isLoading ? 'Creating...' : 'Next' }}
+          </button>
+        </div>
       </div>
 
-      <div class="small-text">
-        Use 8 or more characters with a mix of letters, numbers & symbols
-      </div>
+      <!-- OTP Verification Form -->
+      <div *ngIf="showOtpInput">
+        <div class="full-row">
+          <input 
+            class="full-input" 
+            type="text" 
+            placeholder="Enter OTP sent to your email*"
+            [(ngModel)]="otp"
+            [disabled]="isLoading"
+            maxlength="6"
+          />
+        </div>
 
-      <div class="checkbox-row">
-        <input type="checkbox" />
-        <span>Show Password</span>
-      </div>
+        <div class="small-text">
+          Enter the 6-digit code sent to {{ email }}
+        </div>
 
-      <div class="bottom-row">
-        <a class="link-blue" routerLink="/login">Sign in instead</a>
-        <button class="next-btn">Next</button>
+        <div class="bottom-row">
+          <button class="next-btn" (click)="onVerifyOtp()" [disabled]="isLoading">
+            {{ isLoading ? 'Verifying...' : 'Verify OTP' }}
+          </button>
+        </div>
       </div>
     </div>
 

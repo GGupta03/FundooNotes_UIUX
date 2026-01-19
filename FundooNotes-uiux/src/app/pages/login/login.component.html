@@ -4,21 +4,72 @@
     <img class="google-logo" src="assets/images/google-logo.png" alt="Google Logo" />
 
     <div class="title">Login</div>
-    <div class="subtitle">Use your Google Account</div>
+    <div class="subtitle">Use your Account</div>
 
-    <div class="input-group">
-      <input class="auth-input" type="text" placeholder="Email or phone*" />
-      <input class="auth-input" type="password" placeholder="Password*" />
+    <div *ngIf="errorMessage" style="color: #d32f2f; margin-bottom: 15px; padding: 10px; background-color: #ffebee; border-radius: 4px;">
+      ⚠️ {{ errorMessage }}
     </div>
 
-    <div class="links-row">
-      <a class="link-blue" href="#">forgot Password?</a>
+    <div *ngIf="successMessage" style="color: #388e3c; margin-bottom: 15px; padding: 10px; background-color: #f1f8e9; border-radius: 4px;">
+      ✓ {{ successMessage }}
     </div>
 
-    <div class="bottom-row">
-      <a class="link-blue" routerLink="/register">Create account</a>
+    <!-- Login Form -->
+    <div *ngIf="!showOtpInput">
+      <div class="input-group">
+        <input 
+          class="auth-input" 
+          type="email" 
+          placeholder="Email*"
+          [(ngModel)]="email"
+          [disabled]="isLoading"
+        />
+        <input 
+          class="auth-input" 
+          type="password" 
+          placeholder="Password*"
+          [(ngModel)]="password"
+          [disabled]="isLoading"
+          (keyup.enter)="onLogin()"
+        />
+      </div>
 
-      <button class="login-btn">Login</button>
+      <div class="links-row">
+        <a class="link-blue" routerLink="/forgot-password">Forgot Password?</a>
+      </div>
+
+      <div class="bottom-row">
+        <a class="link-blue" routerLink="/register" [class.disabled]="isLoading">Create account</a>
+
+        <button class="login-btn" (click)="onLogin()" [disabled]="isLoading">
+          {{ isLoading ? 'Logging in...' : 'Login' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- OTP Verification Form -->
+    <div *ngIf="showOtpInput">
+      <div class="input-group">
+        <input 
+          class="auth-input" 
+          type="text" 
+          placeholder="Enter OTP sent to your email*"
+          [(ngModel)]="otp"
+          [disabled]="isLoading"
+          maxlength="6"
+          (keyup.enter)="onVerifyOtp()"
+        />
+      </div>
+
+      <div style="font-size: 12px; color: #666; margin-bottom: 15px;">
+        Enter the 6-digit code sent to {{ email }}
+      </div>
+
+      <div class="bottom-row">
+        <button class="login-btn" (click)="onVerifyOtp()" [disabled]="isLoading">
+          {{ isLoading ? 'Verifying...' : 'Verify OTP' }}
+        </button>
+      </div>
     </div>
 
   </div>

@@ -1,0 +1,48 @@
+<div class="notes-wrapper">
+
+  <!-- ✅ GOOGLE KEEP CREATE NOTE -->
+  <div class="create-note" (click)="expandBox()">
+
+    <!-- title shows only in expanded mode -->
+    <input
+      *ngIf="isExpanded"
+      class="note-input title-input"
+      type="text"
+      placeholder="Title"
+      [(ngModel)]="title"
+      (click)="$event.stopPropagation()"
+    />
+
+    <!-- description + icons row -->
+    <div class="note-row">
+      <textarea
+        class="note-input desc-input"
+        placeholder="Take a note..."
+        [(ngModel)]="description"
+        rows="1"
+        (click)="$event.stopPropagation()"
+      ></textarea>
+
+      <div class="note-icons">
+        <span class="material-symbols-outlined">check_box</span>
+        <span class="material-symbols-outlined">brush</span>
+        <span class="material-symbols-outlined">image</span>
+      </div>
+    </div>
+
+    <!-- close button shows only if expanded -->
+    <div class="note-actions" *ngIf="isExpanded" (click)="$event.stopPropagation()">
+      <button class="close-btn" (click)="saveAndClose()">Close</button>
+    </div>
+
+  </div>
+
+  <!-- ✅ NOTES DISPLAY GRID -->
+  <div class="notes-grid">
+    <div class="note-box" *ngFor="let note of notes">
+      <h4 *ngIf="note.title">{{ note.title }}</h4>
+      <p *ngIf="note.description">{{ note.description }}</p>
+    </div>
+  </div>
+
+</div>

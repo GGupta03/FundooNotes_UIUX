@@ -48,3 +48,10 @@
 .note-icon:hover {
   background: #f1f3f4;
 }
+
+.notes-page {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
