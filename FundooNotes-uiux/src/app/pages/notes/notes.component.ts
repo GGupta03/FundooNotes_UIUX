@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NoteCardComponent } from '../note-card/note-card.component';
-import { NoteService, Note, CreateNoteRequest } from '../../services/note.service';
+import { NoteService } from '../../services/note.service';
 
 @Component({
   selector: 'app-notes',
@@ -12,7 +12,7 @@ import { NoteService, Note, CreateNoteRequest } from '../../services/note.servic
   styleUrl: './notes.component.css',
 })
 export class NotesComponent implements OnInit {
-  notes: Note[] = [];
+  notes: any[] = [];
   isLoading: boolean = false;
   errorMessage: string = '';
   newNoteTitle: string = '';
@@ -28,13 +28,13 @@ export class NotesComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.noteService.getNotes().subscribe({
-      next: (data) => {
-        // Filter out archived and trashed notes
-        this.notes = data.filter(note => !note.isArchived && !note.isTrashed);
+    this.noteService.getAllNotes().subscribe({
+      next: (data: any) => {
+        // Filter out archived notes
+        this.notes = data.filter((note: any) => !note.isArchived);
         this.isLoading = false;
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error loading notes:', error);
         this.errorMessage = 'Failed to load notes';
         this.isLoading = false;
@@ -48,31 +48,29 @@ export class NotesComponent implements OnInit {
       return;
     }
 
-    const request: CreateNoteRequest = {
+    this.noteService.createNote({
       title: this.newNoteTitle,
-      description: this.newNoteDescription
-    };
-
-    this.noteService.createNote(request).subscribe({
-      next: (newNote) => {
+      content: this.newNoteDescription
+    }).subscribe({
+      next: (newNote: any) => {
         this.notes.unshift(newNote);
         this.newNoteTitle = '';
         this.newNoteDescription = '';
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error creating note:', error);
         this.errorMessage = 'Failed to create note';
       }
     });
   }
 
-  deleteNote(noteId: string): void {
+  deleteNote(noteId: number): void {
     if (confirm('Are you sure you want to delete this note?')) {
-      this.noteService.trashNote(noteId).subscribe({
+      this.noteService.deleteNote(noteId).subscribe({
         next: () => {
-          this.notes = this.notes.filter(note => note.id !== noteId);
+          this.notes = this.notes.filter((note: any) => note.id !== noteId);
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('Error deleting note:', error);
           this.errorMessage = 'Failed to delete note';
         }

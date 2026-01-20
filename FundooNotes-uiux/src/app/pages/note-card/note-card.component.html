@@ -1,7 +1,10 @@
 <div class="notes-wrapper">
 
+  <!-- ✅ ERROR MESSAGE -->
+  <div class="error-message" *ngIf="error">{{ error }}</div>
+
   <!-- ✅ GOOGLE KEEP CREATE NOTE -->
-  <div class="create-note" (click)="expandBox()">
+  <div class="create-note" (click)="expandBox()" [style.backgroundColor]="selectedColor">
 
     <!-- title shows only in expanded mode -->
     <input
@@ -23,25 +26,132 @@
         (click)="$event.stopPropagation()"
       ></textarea>
 
-      <div class="note-icons">
-        <span class="material-symbols-outlined">check_box</span>
-        <span class="material-symbols-outlined">brush</span>
-        <span class="material-symbols-outlined">image</span>
+      <div class="note-icons" *ngIf="isExpanded">
+        <span class="material-symbols-outlined" title="Checklist">check_box</span>
+        <span class="material-symbols-outlined" title="Drawing">brush</span>
+        <label for="image-upload" class="image-label">
+          <span class="material-symbols-outlined" title="Add image">image</span>
+          <input 
+            type="file" 
+            id="image-upload" 
+            accept="image/*" 
+            (change)="onImageSelected($event)"
+            style="display: none;"
+          />
+        </label>
       </div>
     </div>
 
-    <!-- close button shows only if expanded -->
-    <div class="note-actions" *ngIf="isExpanded" (click)="$event.stopPropagation()">
-      <button class="close-btn" (click)="saveAndClose()">Close</button>
+    <!-- image preview -->
+    <div class="image-preview" *ngIf="imagePreview">
+      <img [src]="imagePreview" alt="Preview" />
+    </div>
+
+    <!-- color picker - shows only if expanded -->
+    <div class="color-picker" *ngIf="isExpanded" (click)="$event.stopPropagation()">
+      <div 
+        *ngFor="let color of colorPalette"
+        class="color-option"
+        [style.backgroundColor]="color"
+        (click)="changeColor(color)"
+        [class.selected]="selectedColor === color"
+        title="Change color"
+      ></div>
+    </div>
+
+    <!-- toolbar - shows only if expanded -->
+    <div class="note-toolbar" *ngIf="isExpanded" (click)="$event.stopPropagation()">
+      <div class="toolbar-left">
+        <span class="material-symbols-outlined" title="Add reminder">schedule</span>
+        <span class="material-symbols-outlined" title="Add collaborator">group_add</span>
+      </div>
+      <button class="save-btn" (click)="saveAndClose()">Save</button>
     </div>
 
   </div>
 
+  <!-- ✅ LOADING STATE -->
+  <div class="loading" *ngIf="loading">Loading notes...</div>
+
   <!-- ✅ NOTES DISPLAY GRID -->
   <div class="notes-grid">
-    <div class="note-box" *ngFor="let note of notes">
-      <h4 *ngIf="note.title">{{ note.title }}</h4>
-      <p *ngIf="note.description">{{ note.description }}</p>
+    <div 
+      class="note-box" 
+      *ngFor="let note of notes"
+      [style.backgroundColor]="note.color || '#FFFFFF'"
+      [class.archived]="note.isArchived"
+    >
+      <div class="note-content" (click)="editNote(note, $event)">
+        <h4 *ngIf="note.title" class="note-title">{{ note.title }}</h4>
+        <p *ngIf="note.description" class="note-description">{{ note.description }}</p>
+        <img *ngIf="note.imageUrl" [src]="note.imageUrl" class="note-image" />
+      </div>
+
+      <!-- Pin indicator -->
+      <span 
+        class="material-symbols-outlined pin-icon" 
+        *ngIf="note.isPinned"
+        title="Unpinned"
+      >
+        keep
+      </span>
+
+      <!-- Note toolbar -->
+      <div class="note-toolbar-bottom">
+        <span class="material-symbols-outlined" title="Remind me">schedule</span>
+        <span class="material-symbols-outlined" title="Collaborator">group_add</span>
+        <span class="material-symbols-outlined" title="Add color">palette</span>
+        <div class="more-menu">
+          <span class="material-symbols-outlined menu-trigger">more_vert</span>
+          <div class="more-options">
+            <div class="option-group">
+              <div class="color-row">
+                <div 
+                  *ngFor="let color of colorPalette"
+                  class="color-dot"
+                  [style.backgroundColor]="color"
+                  (click)="changeNoteColor(note.id!, color, $event)"
+                  title="Change color"
+                ></div>
+              </div>
+            </div>
+            <hr />
+            <div class="option-item" title="Archive">
+              <span class="material-symbols-outlined">archive</span>
+              <span (click)="archiveNote(note.id!, $event)">Archive</span>
+            </div>
+            <div class="option-item" title="Add label">
+              <span class="material-symbols-outlined">label</span>
+              <span>Add label</span>
+            </div>
+            <div class="option-item" title="Add drawing">
+              <span class="material-symbols-outlined">edit</span>
+              <span>Add drawing</span>
+            </div>
+            <div class="option-item" title="Make a copy">
+              <span class="material-symbols-outlined">content_copy</span>
+              <span>Make a copy</span>
+            </div>
+            <div class="option-item" title="Show checkboxes">
+              <span class="material-symbols-outlined">check_box</span>
+              <span>Show checkboxes</span>
+            </div>
+            <div class="option-item" title="Copy to Google Docs">
+              <span class="material-symbols-outlined">file_open</span>
+              <span>Copy to Google Docs</span>
+            </div>
+            <div class="option-item" title="Version history">
+              <span class="material-symbols-outlined">history</span>
+              <span>Version history</span>
+            </div>
+            <hr />
+            <div class="option-item delete" title="Delete">
+              <span class="material-symbols-outlined">delete</span>
+              <span (click)="deleteNote(note.id!, $event)">Delete note</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 

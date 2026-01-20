@@ -118,6 +118,28 @@
   margin-left: 6px;
 }
 
+.logout-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+  margin-left: 4px;
+}
+
+.logout-btn:hover {
+  background-color: #f1f3f4;
+}
+
+.logout-btn .material-symbols-outlined {
+  font-size: 24px;
+  color: #5f6368;
+}
+
 /* BODY */
 .body {
   flex: 1;

@@ -68,8 +68,13 @@
         </div>
       </div>
 
-      <!-- OTP Verification Form -->
+      <!-- OTP Verification Form - Required to Complete Registration -->
       <div *ngIf="showOtpInput">
+        <div style="background: #e3f2fd; padding: 12px; border-radius: 4px; margin-bottom: 16px; font-size: 13px; color: #1565c0;">
+          📧 <strong>Email Verification Required</strong><br>
+          Complete verification to register your account
+        </div>
+
         <div class="full-row">
           <input 
             class="full-input" 
@@ -87,7 +92,7 @@
 
         <div class="bottom-row">
           <button class="next-btn" (click)="onVerifyOtp()" [disabled]="isLoading">
-            {{ isLoading ? 'Verifying...' : 'Verify OTP' }}
+            {{ isLoading ? 'Verifying...' : 'Verify & Register' }}
           </button>
         </div>
       </div>

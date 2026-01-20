@@ -54,77 +54,84 @@ export class NoteService {
   /**
    * Get all notes
    */
-  getNotes(): Observable<Note[]> {
-    return this.apiService.get<Note[]>('/notes');
+  getAllNotes(): Observable<any> {
+    return this.apiService.get<any>('/notes');
   }
 
   /**
    * Get single note by ID
    */
-  getNote(noteId: string): Observable<Note> {
-    return this.apiService.get<Note>(`/notes/${noteId}`);
+  getNote(noteId: number): Observable<any> {
+    return this.apiService.get<any>(`/notes/${noteId}`);
   }
 
   /**
    * Create a new note
    */
-  createNote(request: CreateNoteRequest): Observable<Note> {
-    return this.apiService.post<Note>('/notes', request);
+  createNote(request: any): Observable<any> {
+    return this.apiService.post<any>('/notes', request);
   }
 
   /**
    * Update note
    */
-  updateNote(noteId: string, request: UpdateNoteRequest): Observable<Note> {
-    return this.apiService.put<Note>(`/notes/${noteId}`, request);
+  updateNote(noteId: number, request: any): Observable<any> {
+    return this.apiService.put<any>(`/notes/${noteId}`, request);
   }
 
   /**
    * Archive note
    */
-  archiveNote(noteId: string): Observable<any> {
-    return this.apiService.put<any>(`/notes/${noteId}`, { isArchived: true });
+  archiveNote(noteId: number): Observable<any> {
+    return this.apiService.patch<any>(`/notes/${noteId}/archive`, {});
   }
 
   /**
-   * Trash note
+   * Pin note
    */
-  trashNote(noteId: string): Observable<any> {
-    return this.apiService.put<any>(`/notes/${noteId}`, { isTrashed: true });
+  pinNote(noteId: number): Observable<any> {
+    return this.apiService.patch<any>(`/notes/${noteId}/pin`, {});
   }
 
   /**
    * Delete note permanently
    */
-  deleteNote(noteId: string): Observable<any> {
+  deleteNote(noteId: number): Observable<any> {
     return this.apiService.delete<any>(`/notes/${noteId}`);
+  }
+
+  /**
+   * Change note color
+   */
+  changeNoteColor(noteId: number, color: string): Observable<any> {
+    return this.apiService.patch<any>(`/notes/${noteId}/color`, { color });
   }
 
   /**
    * Add label to note
    */
-  addLabelToNote(noteId: string, labelId: string): Observable<any> {
+  addLabelToNote(noteId: number, labelId: number): Observable<any> {
     return this.apiService.post<any>(`/notes/${noteId}/labels/${labelId}`, {});
   }
 
   /**
    * Remove label from note
    */
-  removeLabelFromNote(noteId: string, labelId: string): Observable<any> {
+  removeLabelFromNote(noteId: number, labelId: number): Observable<any> {
     return this.apiService.delete<any>(`/notes/${noteId}/labels/${labelId}`);
   }
 
   /**
    * Add collaborator to note
    */
-  addCollaborator(noteId: string, email: string): Observable<any> {
+  addCollaborator(noteId: number, email: string): Observable<any> {
     return this.apiService.post<any>(`/notes/${noteId}/collaborators`, { email });
   }
 
   /**
    * Remove collaborator from note
    */
-  removeCollaborator(noteId: string, collaboratorId: string): Observable<any> {
+  removeCollaborator(noteId: number, collaboratorId: number): Observable<any> {
     return this.apiService.delete<any>(`/notes/${noteId}/collaborators/${collaboratorId}`);
   }
 }

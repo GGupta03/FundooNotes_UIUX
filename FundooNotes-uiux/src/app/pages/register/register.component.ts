@@ -92,10 +92,11 @@ export class RegisterComponent {
     }).subscribe({
       next: (response) => {
         console.log('OTP verification response:', response);
-        this.successMessage = response.message || 'Email verified successfully. Redirecting to login...';
+        // ✅ EMAIL VERIFIED - User is now fully registered
+        this.successMessage = response.message || 'Email verified successfully! Your account is now registered. Redirecting to login...';
         setTimeout(() => {
           this.router.navigate(['/login']);
-        }, 1000);
+        }, 1500);
         this.isLoading = false;
       },
       error: (error) => {
