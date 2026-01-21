@@ -1,24 +1,22 @@
-import { Injectable } from '@angular/core';
-import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Router, CanActivateFn } from '@angular/router';
 import { AuthService } from './auth.service';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class AuthGuard implements CanActivate {
+export const AuthGuard: CanActivateFn = (route, state) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+  const platformId = inject(PLATFORM_ID);
 
-  constructor(private authService: AuthService, private router: Router) {}
+  // Allow access on server-side rendering
+  if (!isPlatformBrowser(platformId)) {
+    return true;
+  }
 
-  canActivate(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
-  ): boolean {
-    if (this.authService.isAuthenticated()) {
-      return true;
-    }
-
-    // Store the attempted URL for redirecting after login
-    this.router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
+  if (authService.isAuthenticated()) {
+    return true;
+  } else {
+    router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
     return false;
   }
-}
+};

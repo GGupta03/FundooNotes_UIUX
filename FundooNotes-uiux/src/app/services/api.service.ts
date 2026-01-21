@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -9,78 +10,61 @@ import { environment } from '../../environments/environment';
 export class ApiService {
   private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
     console.log('API Service initialized with URL:', this.apiUrl);
   }
 
-  /**
-   * Get authorization headers with JWT token
-   */
+  private isBrowser(): boolean {
+    return isPlatformBrowser(this.platformId);
+  }
+
   private getHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token');
     let headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
-
-    if (token) {
-      headers = headers.set('Authorization', `Bearer ${token}`);
+    
+    if (this.isBrowser()) {
+      const token = localStorage.getItem('token');
+      if (token) {
+        headers = headers.set('Authorization', `Bearer ${token}`);
+      }
     }
-
+    
     return headers;
   }
 
-  /**
-   * Generic GET request
-   */
   get<T>(endpoint: string): Observable<T> {
-    const url = `${this.apiUrl}${endpoint}`;
-    console.log('GET:', url);
-    return this.http.get<T>(url, {
+    return this.http.get<T>(`${this.apiUrl}${endpoint}`, {
       headers: this.getHeaders()
     });
   }
 
-  /**
-   * Generic POST request
-   */
-  post<T>(endpoint: string, body: any): Observable<T> {
-    const url = `${this.apiUrl}${endpoint}`;
-    console.log('POST:', url, body);
-    return this.http.post<T>(url, body, {
+  post<T>(endpoint: string, data: any): Observable<T> {
+    return this.http.post<T>(`${this.apiUrl}${endpoint}`, data, {
       headers: this.getHeaders()
     });
   }
 
-  /**
-   * Generic PUT request
-   */
-  put<T>(endpoint: string, body: any): Observable<T> {
-    const url = `${this.apiUrl}${endpoint}`;
-    console.log('PUT:', url, body);
-    return this.http.put<T>(url, body, {
+  put<T>(endpoint: string, data: any): Observable<T> {
+    return this.http.put<T>(`${this.apiUrl}${endpoint}`, data, {
       headers: this.getHeaders()
     });
   }
 
-  /**
-   * Generic PATCH request
-   */
-  patch<T>(endpoint: string, body: any): Observable<T> {
-    const url = `${this.apiUrl}${endpoint}`;
-    console.log('PATCH:', url, body);
-    return this.http.patch<T>(url, body, {
+  patch<T>(endpoint: string, data: any): Observable<T> {
+    return this.http.patch<T>(`${this.apiUrl}${endpoint}`, data, {
       headers: this.getHeaders()
     });
   }
 
-  /**
-   * Generic DELETE request
-   */
-  delete<T>(endpoint: string): Observable<T> {
-    const url = `${this.apiUrl}${endpoint}`;
-    console.log('DELETE:', url);
-    return this.http.delete<T>(url, {
-      headers: this.getHeaders()
-    });
+  delete<T>(endpoint: string, data?: any): Observable<T> {
+    const options = {
+      headers: this.getHeaders(),
+      body: data
+    };
+    return this.http.delete<T>(`${this.apiUrl}${endpoint}`, options);
   }
 }

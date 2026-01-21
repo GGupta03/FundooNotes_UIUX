@@ -1,47 +1,16 @@
 import { Injectable } from '@angular/core';
-import { ApiService } from './api.service';
 import { Observable } from 'rxjs';
+import { ApiService } from './api.service';
 
 export interface Note {
-  id: string;
+  id?: number;
   title: string;
-  description: string;
-  isArchived: boolean;
-  isTrashed: boolean;
-  createdAt: string;
-  updatedAt: string;
-  labels?: Label[];
-  reminders?: Reminder[];
-  collaborators?: Collaborator[];
+  content: string;
   color?: string;
-}
-
-export interface CreateNoteRequest {
-  title: string;
-  description: string;
-}
-
-export interface UpdateNoteRequest {
-  title?: string;
-  description?: string;
+  isPinned?: boolean;
   isArchived?: boolean;
-  isTrashed?: boolean;
-  color?: string;
-}
-
-export interface Label {
-  id: string;
-  name: string;
-}
-
-export interface Reminder {
-  id: string;
-  reminderTime: string;
-}
-
-export interface Collaborator {
-  id: string;
-  email: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 @Injectable({
@@ -51,87 +20,53 @@ export class NoteService {
 
   constructor(private apiService: ApiService) {}
 
-  /**
-   * Get all notes
-   */
-  getAllNotes(): Observable<any> {
-    return this.apiService.get<any>('/notes');
+  // Get all notes
+  getAllNotes(): Observable<Note[]> {
+    return this.apiService.get<Note[]>('notes');
   }
 
-  /**
-   * Get single note by ID
-   */
-  getNote(noteId: number): Observable<any> {
-    return this.apiService.get<any>(`/notes/${noteId}`);
+  // Get note by ID
+  getNoteById(id: number): Observable<Note> {
+    return this.apiService.get<Note>(`notes/${id}`);
   }
 
-  /**
-   * Create a new note
-   */
-  createNote(request: any): Observable<any> {
-    return this.apiService.post<any>('/notes', request);
+  // Create new note
+  createNote(note: { title: string; content: string }): Observable<any> {
+    return this.apiService.post('notes', note);
   }
 
-  /**
-   * Update note
-   */
-  updateNote(noteId: number, request: any): Observable<any> {
-    return this.apiService.put<any>(`/notes/${noteId}`, request);
+  // Update note
+  updateNote(id: number, note: { title: string; content: string }): Observable<any> {
+    return this.apiService.put(`notes/${id}`, note);
   }
 
-  /**
-   * Archive note
-   */
-  archiveNote(noteId: number): Observable<any> {
-    return this.apiService.patch<any>(`/notes/${noteId}/archive`, {});
+  // Delete note
+  deleteNote(id: number): Observable<any> {
+    return this.apiService.delete(`notes/${id}`);
   }
 
-  /**
-   * Pin note
-   */
-  pinNote(noteId: number): Observable<any> {
-    return this.apiService.patch<any>(`/notes/${noteId}/pin`, {});
+  // Pin/Unpin note
+  pinNote(id: number): Observable<any> {
+    return this.apiService.patch(`notes/${id}/pin`, {});
   }
 
-  /**
-   * Delete note permanently
-   */
-  deleteNote(noteId: number): Observable<any> {
-    return this.apiService.delete<any>(`/notes/${noteId}`);
+  // Archive/Unarchive note
+  archiveNote(id: number): Observable<any> {
+    return this.apiService.patch(`notes/${id}/archive`, {});
   }
 
-  /**
-   * Change note color
-   */
-  changeNoteColor(noteId: number, color: string): Observable<any> {
-    return this.apiService.patch<any>(`/notes/${noteId}/color`, { color });
+  // Change note color
+  changeNoteColor(id: number, color: string): Observable<any> {
+    return this.apiService.patch(`notes/${id}/color`, { color });
   }
 
-  /**
-   * Add label to note
-   */
-  addLabelToNote(noteId: number, labelId: number): Observable<any> {
-    return this.apiService.post<any>(`/notes/${noteId}/labels/${labelId}`, {});
+  // Search notes
+  searchNotes(keyword: string): Observable<Note[]> {
+    return this.apiService.get<Note[]>(`notes/search?keyword=${keyword}`);
   }
 
-  /**
-   * Remove label from note
-   */
-  removeLabelFromNote(noteId: number, labelId: number): Observable<any> {
-    return this.apiService.delete<any>(`/notes/${noteId}/labels/${labelId}`);
-  }
-
-  /**
-   * Add collaborator to note
-   */
-  addCollaborator(noteId: number, email: string): Observable<any> {
-    return this.apiService.post<any>(`/notes/${noteId}/collaborators`, { email });
-  }
-
-  /**
-   * Remove collaborator from note
-   */
-  removeCollaborator(noteId: number, collaboratorId: number): Observable<any> {
-    return this.apiService.delete<any>(`/notes/${noteId}/collaborators/${collaboratorId}`);
+  // Bulk delete notes
+  bulkDeleteNotes(noteIds: number[]): Observable<any> {
+    return this.apiService.delete('notes/bulk', { noteIds });
   }
 }

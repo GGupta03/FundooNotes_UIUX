@@ -1,253 +1,243 @@
-.notes-wrapper {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px 0;
-}
-
-.error-message {
-  background-color: #ffcdd2;
-  color: #c62828;
-  padding: 12px 16px;
-  border-radius: 4px;
-  margin-bottom: 16px;
-  width: 90%;
-  max-width: 600px;
-}
-
-.loading {
-  text-align: center;
-  color: #5f6368;
-  padding: 20px;
-}
-
-/* ✅ create note box (same as keep style) */
+/* ==================== CREATE NOTE BOX ==================== */
 .create-note {
   width: 600px;
   max-width: 92%;
   background: white;
   border-radius: 8px;
   border: 1px solid #e0e0e0;
-  padding: 12px 14px;
-  margin-top: 28px;
+  margin: 32px auto 16px auto;
   cursor: text;
-  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.15),
-    0 1px 3px rgba(60, 64, 67, 0.1);
+  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3), 0 2px 6px rgba(60, 64, 67, 0.15);
   transition: box-shadow 0.2s;
+  position: relative;
 }
 
-.create-note:hover:not(.expanded) {
-  box-shadow: 0 2px 6px rgba(60, 64, 67, 0.25);
+.create-note:hover {
+  box-shadow: 0 2px 4px rgba(60, 64, 67, 0.3), 0 4px 8px rgba(60, 64, 67, 0.15);
 }
 
-/* row for textarea + icons */
-.note-row {
+/* Collapsed state */
+.create-note:not(.expanded) {
+  padding: 12px 16px;
+  min-height: 46px;
+}
+
+.create-note:not(.expanded) .note-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 16px;
 }
 
+/* Expanded state */
+.create-note.expanded {
+  padding: 12px 16px;
+  cursor: default;
+}
+
+/* ==================== INPUT STYLING ==================== */
 .note-input {
   border: none;
   outline: none;
   width: 100%;
-  font-size: 15px;
-  font-family: Arial, sans-serif;
+  font-size: 14px;
+  font-family: 'Roboto', Arial, sans-serif;
   resize: none;
   background: transparent;
+  color: #202124;
+  line-height: 1.5;
+}
+
+.note-input::placeholder {
+  color: #5f6368;
 }
 
 .title-input {
-  font-weight: 600;
-  margin-bottom: 10px;
+  font-weight: 500;
   font-size: 16px;
+  padding: 3px 0;
+  margin-bottom: 10px;
 }
 
 .desc-input {
   color: #202124;
-  min-height: 40px;
+  min-height: 20px;
+  padding: 3px 0;
 }
 
-/* right icons */
+/* Collapsed state - single line textarea */
+.create-note:not(.expanded) .desc-input {
+  flex: 1;
+  cursor: text;
+  overflow: hidden;
+}
+
+/* ==================== NOTE ROW ==================== */
+.note-row {
+  display: block;
+}
+
+.create-note.expanded .note-row {
+  display: block;
+}
+
+/* ==================== COLLAPSED ICONS ==================== */
 .note-icons {
   display: flex;
-  gap: 14px;
-  color: #5f6368;
+  gap: 4px;
+  align-items: center;
 }
 
-.note-icons span,
-.image-label {
-  font-size: 20px;
+/* ==================== ICON BUTTON SHARED ==================== */
+.icon-btn {
+  font-size: 18px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
+  padding: 8px;
   border-radius: 50%;
   transition: background-color 0.2s;
+  color: #5f6368;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.note-icons span:hover,
-.image-label:hover {
-  background-color: #f1f3f4;
+.icon-btn:hover {
+  background-color: rgba(95, 99, 104, 0.08);
 }
 
-/* Image preview */
+/* ==================== IMAGE PREVIEW ==================== */
 .image-preview {
-  margin: 8px 0;
-  border-radius: 4px;
+  margin: 12px 0;
+  border-radius: 8px;
   overflow: hidden;
+  position: relative;
+  max-height: 240px;
+  background: #f8f9fa;
 }
 
 .image-preview img {
   width: 100%;
-  max-height: 200px;
-  object-fit: cover;
+  max-height: 240px;
+  object-fit: contain;
+  display: block;
 }
 
-.image-label {
-  cursor: pointer;
-}
-
-/* Color picker */
-.color-picker {
-  display: flex;
-  gap: 8px;
-  margin: 12px 0;
-  flex-wrap: wrap;
-  padding-top: 12px;
-  border-top: 1px solid #e0e0e0;
-}
-
-.color-option {
-  width: 24px;
-  height: 24px;
+.remove-image {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  border: 2px solid transparent;
-  transition: 0.2s;
+  font-size: 20px;
+  line-height: 1;
+  transition: background-color 0.2s;
 }
 
-.color-option:hover {
-  transform: scale(1.15);
+.remove-image:hover {
+  background: rgba(0, 0, 0, 0.8);
 }
 
-.color-option.selected {
-  border-color: #5f6368;
-}
-
-/* Note toolbar in create box */
+/* ==================== NOTE TOOLBAR ==================== */
 .note-toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid #e0e0e0;
+  padding-top: 4px;
+  min-height: 36px;
 }
 
 .toolbar-left {
   display: flex;
-  gap: 16px;
-  color: #5f6368;
-}
-
-.toolbar-left span {
-  font-size: 20px;
-  cursor: pointer;
-  display: flex;
+  gap: 2px;
   align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  transition: background-color 0.2s;
+  flex-wrap: wrap;
 }
 
-.toolbar-left span:hover {
-  background-color: #f1f3f4;
+/* Image label styling */
+.image-label {
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
 }
 
-.save-btn {
+.image-label .material-symbols-outlined {
+  pointer-events: none;
+}
+
+/* Vertical divider */
+.divider {
+  width: 1px;
+  height: 24px;
+  background-color: #dadce0;
+  margin: 0 8px;
+  flex-shrink: 0;
+}
+
+/* ==================== CLOSE BUTTON ==================== */
+.close-btn {
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 6px 12px;
+  padding: 8px 24px;
   border-radius: 4px;
   font-weight: 500;
-  color: #1f73e6;
-  transition: 0.2s;
+  font-size: 14px;
+  color: #202124;
+  transition: background-color 0.2s;
+  font-family: 'Roboto', Arial, sans-serif;
+  flex-shrink: 0;
 }
 
-.save-btn:hover {
-  background: #e8f0fe;
+.close-btn:hover {
+  background-color: rgba(95, 99, 104, 0.08);
 }
 
-/* ✅ notes grid like keep */
-.notes-grid {
-  width: 92%;
+/* ==================== NOTES GRID ==================== */
+.notes-container {
+  width: 100%;
   max-width: 1050px;
-  margin-top: 30px;
+  margin: 0 auto;
+  padding: 0 16px 32px 16px;
+}
+
+.notes-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 16px;
+  margin-top: 16px;
 }
 
-/* ✅ each note card */
-.note-box {
+.note-item {
   background: white;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
-  padding: 12px 14px;
-  min-height: 80px;
-  transition: all 0.2s;
-  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.15);
+  padding: 12px 16px;
   cursor: pointer;
+  transition: box-shadow 0.2s;
   position: relative;
+  word-wrap: break-word;
+  min-height: 120px;
   display: flex;
   flex-direction: column;
 }
 
-.note-box:hover {
-  box-shadow: 0 4px 12px rgba(60, 64, 67, 0.25);
+.note-item:hover {
+  box-shadow: 0 2px 4px rgba(60, 64, 67, 0.3), 0 4px 8px rgba(60, 64, 67, 0.15);
 }
 
-.note-box.archived {
-  opacity: 0.7;
-}
-
-.note-content {
-  flex: 1;
-  cursor: pointer;
-}
-
-.note-title {
-  margin: 0 0 6px 0;
-  font-size: 15px;
-  font-weight: 600;
-  color: #202124;
-}
-
-.note-description {
-  margin: 0;
-  font-size: 14px;
-  color: #202124;
-  word-break: break-word;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.note-image {
-  width: 100%;
-  max-height: 120px;
-  object-fit: cover;
-  border-radius: 4px;
-  margin-top: 6px;
+.note-item:hover .note-footer-hover {
+  opacity: 1;
+  visibility: visible;
 }
 
 .pin-icon {
@@ -258,114 +248,93 @@
   color: #5f6368;
 }
 
-/* Note toolbar at bottom */
-.note-toolbar-bottom {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 12px;
-  padding-top: 8px;
-  border-top: 1px solid #e0e0e0;
-  visibility: hidden;
+.note-content {
+  flex: 1;
+  margin-bottom: 4px;
+  min-height: 60px;
 }
 
-.note-box:hover .note-toolbar-bottom {
-  visibility: visible;
+.note-title {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0 0 8px 0;
+  color: #202124;
+  line-height: 1.5;
+  word-wrap: break-word;
 }
 
-.note-toolbar-bottom span {
-  font-size: 18px;
-  color: #5f6368;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  transition: background-color 0.2s;
-}
-
-.note-toolbar-bottom span:hover {
-  background-color: #f1f3f4;
-}
-
-/* More menu */
-.more-menu {
-  position: relative;
-}
-
-.menu-trigger {
-  cursor: pointer !important;
-}
-
-.more-options {
-  position: absolute;
-  right: -8px;
-  top: 32px;
-  background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  min-width: 200px;
-  box-shadow: 0 4px 16px rgba(60, 64, 67, 0.3);
-  z-index: 1000;
-  padding: 8px 0;
-  display: none;
-}
-
-.more-menu:hover .more-options,
-.more-options:hover {
-  display: block !important;
-}
-
-.option-group {
-  padding: 8px 12px;
-}
-
-.color-row {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.color-dot {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  cursor: pointer;
-  border: 1px solid #ddd;
-  transition: 0.2s;
-}
-
-.color-dot:hover {
-  transform: scale(1.15);
-}
-
-.option-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  cursor: pointer;
+.note-description {
   font-size: 14px;
   color: #202124;
-  transition: background-color 0.2s;
+  margin: 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 10;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
-.option-item:hover {
-  background-color: #f8f9fa;
+.note-footer-hover {
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid transparent;
 }
 
-.option-item.delete {
-  color: #d32f2f;
+.note-item:hover .note-footer-hover {
+  border-top-color: #e0e0e0;
 }
 
-.option-item span {
+.icon-btn-small {
   font-size: 18px;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+  color: #5f6368;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.more-options hr {
-  border: none;
-  border-top: 1px solid #e0e0e0;
-  margin: 4px 0;
+.icon-btn-small:hover {
+  background-color: rgba(95, 99, 104, 0.15);
+}
+
+/* ==================== EMPTY STATE ==================== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 100px;
+  color: #5f6368;
+}
+
+.empty-icon {
+  font-size: 120px;
+  opacity: 0.15;
+}
+
+.empty-text {
+  font-size: 22px;
+  margin-top: 16px;
+  font-weight: 400;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+  .notes-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .create-note {
+    width: 100%;
+  }
 }

@@ -1,18 +1,9 @@
 import { Injectable } from '@angular/core';
-import { ApiService } from './api.service';
 import { Observable } from 'rxjs';
+import { ApiService } from './api.service';
 
 export interface Label {
-  id: string;
-  name: string;
-  createdAt: string;
-}
-
-export interface CreateLabelRequest {
-  name: string;
-}
-
-export interface UpdateLabelRequest {
+  id?: number;
   name: string;
 }
 
@@ -23,31 +14,23 @@ export class LabelService {
 
   constructor(private apiService: ApiService) {}
 
-  /**
-   * Get all labels
-   */
+  // Get all labels
   getLabels(): Observable<Label[]> {
-    return this.apiService.get<Label[]>('/labels');
+    return this.apiService.get<Label[]>('labels');
   }
 
-  /**
-   * Create new label
-   */
-  createLabel(request: CreateLabelRequest): Observable<Label> {
-    return this.apiService.post<Label>('/labels', request);
+  // Create label
+  createLabel(name: string): Observable<any> {
+    return this.apiService.post('labels', { name });
   }
 
-  /**
-   * Update label
-   */
-  updateLabel(labelId: string, request: UpdateLabelRequest): Observable<Label> {
-    return this.apiService.put<Label>(`/labels/${labelId}`, request);
+  // Update label
+  updateLabel(id: number, name: string): Observable<any> {
+    return this.apiService.put(`labels/${id}`, { name });
   }
 
-  /**
-   * Delete label
-   */
-  deleteLabel(labelId: string): Observable<any> {
-    return this.apiService.delete<any>(`/labels/${labelId}`);
+  // Delete label
+  deleteLabel(id: number): Observable<any> {
+    return this.apiService.delete(`labels/${id}`);
   }
 }

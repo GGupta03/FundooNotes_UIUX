@@ -1,64 +1,47 @@
-import { Component, OnInit } from '@angular/core';
-import { RouterModule, Router, ActivatedRoute } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { Component, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { CommonModule } from '@angular/common';
-
-import { MatCardModule } from '@angular/material/card';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-
+import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [
-    RouterModule,
-    FormsModule,
-    CommonModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule
-  ],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent {
   email: string = '';
   password: string = '';
-  isLoading: boolean = false;
+  otp: string = '';
+  showOtpInput: boolean = false;
   errorMessage: string = '';
   successMessage: string = '';
-  returnUrl: string = '';
-
-  // OTP verification state
-  showOtpInput: boolean = false;
-  otp: string = '';
+  isLoading: boolean = false;
+  isBrowser: boolean;
 
   constructor(
     private authService: AuthService,
     private router: Router,
-    private route: ActivatedRoute
-  ) {}
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+  }
 
-  ngOnInit(): void {
-    // Get return URL from route parameters or default to '/dashboard'
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
-
-    // If already logged in, redirect to dashboard
-    if (this.authService.isAuthenticated()) {
-      this.router.navigate([this.returnUrl]);
-    }
+  isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   }
 
   onLogin(): void {
     this.errorMessage = '';
     this.successMessage = '';
 
+    // Validation
     if (!this.email || !this.password) {
-      this.errorMessage = 'Please enter email and password';
+      this.errorMessage = 'Please fill in all fields';
       return;
     }
 
@@ -67,82 +50,97 @@ export class LoginComponent implements OnInit {
       return;
     }
 
+    if (this.password.length < 6) {
+      this.errorMessage = 'Password must be at least 6 characters';
+      return;
+    }
+
     this.isLoading = true;
 
-    this.authService.login({ email: this.email, password: this.password })
-      .subscribe({
-        next: (response) => {
-          console.log('Login response:', response);
-          
-          if (response.token) {
-            this.authService.saveToken(response.token);
-            this.successMessage = 'Login successful! Redirecting...';
-            setTimeout(() => {
-              this.router.navigate([this.returnUrl]);
-            }, 500);
-          } else if (response.message) {
-            // OTP sent for login
-            this.successMessage = response.message || 'OTP sent to your email';
-            this.showOtpInput = true;
-          }
-          this.isLoading = false;
-        },
-        error: (error) => {
-          console.error('Login error:', error);
-          
-          if (error.status === 0) {
-            this.errorMessage = 'Connection error: Backend is not accessible. Make sure the backend is running on http://localhost:5001';
-          } else if (error.status === 400 || error.status === 401) {
-            this.errorMessage = error.error?.message || 'Invalid email or password';
-          } else if (error.status === 500) {
-            this.errorMessage = 'Server error. Please try again later.';
-          } else {
-            this.errorMessage = error.error?.message || 'Login failed. Please try again.';
-          }
-          
-          this.isLoading = false;
+    const loginData = {
+      email: this.email,
+      password: this.password
+    };
+
+    this.authService.login(loginData).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        this.successMessage = response.message || 'OTP sent to your email';
+        this.showOtpInput = true;
+        
+        // If token is returned immediately (no OTP required)
+        if (response.token) {
+          this.authService.saveToken(response.token);
+          this.router.navigate(['/dashboard']);
         }
-      });
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.errorMessage = error.error?.message || 'Login failed. Please try again.';
+        console.error('Login error:', error);
+      }
+    });
   }
 
   onVerifyOtp(): void {
+    this.errorMessage = '';
+    this.successMessage = '';
+
     if (!this.otp) {
       this.errorMessage = 'Please enter the OTP';
       return;
     }
 
-    this.isLoading = true;
-    this.errorMessage = '';
+    if (this.otp.length !== 6) {
+      this.errorMessage = 'OTP must be 6 digits';
+      return;
+    }
 
-    this.authService.verifyOtp({
+    this.isLoading = true;
+
+    const otpData = {
       email: this.email,
       otp: this.otp,
       purpose: 'LOGIN'
-    }).subscribe({
+    };
+
+    this.authService.verifyOtp(otpData).subscribe({
       next: (response) => {
-        console.log('OTP verification response:', response);
+        this.isLoading = false;
+        this.successMessage = response.message || 'Login successful!';
         
         if (response.token) {
           this.authService.saveToken(response.token);
-          this.successMessage = 'Login successful! Redirecting...';
           setTimeout(() => {
-            this.router.navigate([this.returnUrl]);
+            this.router.navigate(['/dashboard']);
           }, 500);
-        } else {
-          this.errorMessage = 'Unexpected response from server';
         }
-        this.isLoading = false;
       },
       error: (error) => {
-        console.error('OTP verification error:', error);
-        this.errorMessage = error.error?.message || 'OTP verification failed. Please try again.';
         this.isLoading = false;
+        this.errorMessage = error.error?.message || 'Invalid OTP. Please try again.';
+        console.error('OTP verification error:', error);
       }
     });
   }
 
-  private isValidEmail(email: string): boolean {
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailPattern.test(email);
+  onResendOtp(): void {
+    this.otp = '';
+    this.errorMessage = '';
+    this.successMessage = '';
+    
+    const loginData = {
+      email: this.email,
+      password: this.password
+    };
+
+    this.authService.login(loginData).subscribe({
+      next: (response) => {
+        this.successMessage = 'OTP resent successfully!';
+      },
+      error: (error) => {
+        this.errorMessage = 'Failed to resend OTP. Please try again.';
+      }
+    });
   }
 }

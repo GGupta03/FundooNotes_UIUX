@@ -1,18 +1,17 @@
-import { CommonModule } from '@angular/common';
 import { Component, HostListener, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NoteService } from '../../services/note.service';
-import { AuthService } from '../../services/auth.service';
 
 interface Note {
-  id?: number;
+  id: number;
   title: string;
-  description: string;
-  createdAt: Date;
+  content: string;
   color?: string;
-  isArchived?: boolean;
-  isPinned?: boolean;
-  imageUrl?: string;
+  isPinned: boolean;
+  isArchived: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 @Component({
@@ -20,196 +19,123 @@ interface Note {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './note-card.component.html',
-  styleUrl: './note-card.component.css',
+  styleUrl: './note-card.component.css'
 })
 export class NoteCardComponent implements OnInit {
   isExpanded = false;
-
   title = '';
   description = '';
-  selectedColor = '#FFFFFF';
-  imageFile: File | null = null;
-  imagePreview: string | ArrayBuffer | null = null;
-
+  selectedColor = '#ffffff';
+  imagePreview: string | null = null;
   notes: Note[] = [];
-  loading = false;
-  error = '';
-  selectedNoteId: number | null = null;
-  editingNoteId: number | null = null;
 
-  colorPalette = [
-    '#FFFFFF', '#F28482', '#F4CCCC', '#FCE5CD', '#F8F7F1',
-    '#E2EFDA', '#E6F3FF', '#EAE6FF', '#F3E6FF', '#FCE5FF'
-  ];
+  constructor(private noteService: NoteService) {}
 
-  constructor(
-    private noteService: NoteService,
-    private authService: AuthService
-  ) {}
-
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadNotes();
   }
 
-  loadNotes() {
-    this.loading = true;
-    this.noteService.getAllNotes().subscribe({
-      next: (response: any) => {
-        this.notes = response || [];
-        this.loading = false;
-      },
-      error: (err) => {
-        this.error = 'Failed to load notes';
-        this.loading = false;
-      }
-    });
-  }
-
-  expandBox() {
+  expandBox(): void {
     this.isExpanded = true;
   }
 
-  onImageSelected(event: any) {
-    const file: File = event.target.files[0];
+  onImageSelected(event: any): void {
+    const file = event.target.files[0];
     if (file) {
-      this.imageFile = file;
       const reader = new FileReader();
-      reader.onload = (e) => {
-        this.imagePreview = e.target?.result || null;
+      reader.onload = (e: any) => {
+        this.imagePreview = e.target.result;
       };
       reader.readAsDataURL(file);
     }
   }
 
-  changeColor(color: string) {
-    this.selectedColor = color;
+  removeImage(): void {
+    this.imagePreview = null;
+    const fileInput = document.getElementById('image-upload') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
   }
 
-  saveAndClose() {
-    const t = (this.title || '').trim();
-    const d = (this.description || '').trim();
+  saveAndClose(): void {
+    if (this.title.trim() || this.description.trim()) {
+      const noteData = {
+        title: this.title,
+        content: this.description
+      };
 
-    if (!t && !d) {
-      this.closeForm();
-      return;
-    }
-
-    this.loading = true;
-
-    if (this.editingNoteId) {
-      // Update existing note
-      this.noteService.updateNote(this.editingNoteId, {
-        title: t,
-        content: d,
-        color: this.selectedColor
-      }).subscribe({
-        next: () => {
+      this.noteService.createNote(noteData).subscribe({
+        next: (response) => {
+          console.log('Note created successfully:', response);
           this.loadNotes();
-          this.closeForm();
+          this.resetForm();
         },
         error: (err) => {
-          this.error = 'Failed to update note';
-          this.loading = false;
+          console.error('Error creating note:', err);
+          alert('Failed to create note. Please try again.');
         }
       });
     } else {
-      // Create new note
-      this.noteService.createNote({
-        title: t,
-        content: d
-      }).subscribe({
-        next: () => {
-          this.loadNotes();
-          this.closeForm();
-        },
-        error: (err) => {
-          this.error = 'Failed to save note';
-          this.loading = false;
-        }
-      });
+      this.resetForm();
     }
   }
 
-  closeForm() {
+  resetForm(): void {
+    this.isExpanded = false;
     this.title = '';
     this.description = '';
-    this.selectedColor = '#FFFFFF';
-    this.imageFile = null;
+    this.selectedColor = '#ffffff';
     this.imagePreview = null;
-    this.isExpanded = false;
-    this.editingNoteId = null;
   }
 
-  deleteNote(noteId: number, event: Event) {
+  loadNotes(): void {
+    this.noteService.getAllNotes().subscribe({
+      next: (data: any) => {
+        console.log('Notes loaded:', data);
+        this.notes = data.filter((note: any) => !note.isArchived);
+      },
+      error: (err) => {
+        console.error('Error loading notes:', err);
+        this.notes = [];
+      }
+    });
+  }
+
+  editNote(note: Note, event: Event): void {
     event.stopPropagation();
-    if (confirm('Delete this note?')) {
-      this.noteService.deleteNote(noteId).subscribe({
-        next: () => {
-          this.loadNotes();
-        },
-        error: (err) => {
-          this.error = 'Failed to delete note';
-        }
-      });
-    }
+    console.log('Edit note:', note);
+    // TODO: Implement edit functionality
   }
 
-  archiveNote(noteId: number, event: Event) {
+  archiveNote(noteId: number, event: Event): void {
     event.stopPropagation();
     this.noteService.archiveNote(noteId).subscribe({
       next: () => {
+        console.log('Note archived');
         this.loadNotes();
       },
-      error: (err) => {
-        this.error = 'Failed to archive note';
-      }
+      error: (err) => console.error('Error archiving note:', err)
     });
   }
 
-  pinNote(noteId: number, event: Event) {
+  deleteNote(noteId: number, event: Event): void {
     event.stopPropagation();
-    this.noteService.pinNote(noteId).subscribe({
-      next: () => {
-        this.loadNotes();
-      },
-      error: (err) => {
-        this.error = 'Failed to pin note';
-      }
-    });
+    if (confirm('Are you sure you want to delete this note?')) {
+      this.noteService.deleteNote(noteId).subscribe({
+        next: () => {
+          console.log('Note deleted');
+          this.loadNotes();
+        },
+        error: (err) => console.error('Error deleting note:', err)
+      });
+    }
   }
 
-  editNote(note: Note, event: Event) {
-    event.stopPropagation();
-    this.title = note.title;
-    this.description = note.description;
-    this.selectedColor = note.color || '#FFFFFF';
-    this.editingNoteId = note.id || null;
-    this.isExpanded = true;
-    this.selectedNoteId = note.id || null;
-  }
-
-  changeNoteColor(noteId: number, color: string, event: Event) {
-    event.stopPropagation();
-    this.noteService.changeNoteColor(noteId, color).subscribe({
-      next: () => {
-        this.loadNotes();
-      },
-      error: (err) => {
-        this.error = 'Failed to change color';
-      }
-    });
-  }
-
-  // ✅ click outside -> auto close like Google Keep
   @HostListener('document:click', ['$event'])
-  outsideClick(event: MouseEvent) {
+  onClickOutside(event: MouseEvent): void {
     const target = event.target as HTMLElement;
-
-    if (target.closest('.create-note')) return;
-    if (target.closest('.color-picker')) return;
-    if (target.closest('.more-menu')) return;
-
-    if (this.isExpanded) {
+    if (this.isExpanded && !target.closest('.create-note')) {
       this.saveAndClose();
     }
   }

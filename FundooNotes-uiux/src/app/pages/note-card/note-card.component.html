@@ -1,158 +1,124 @@
-<div class="notes-wrapper">
+<!-- GOOGLE KEEP CREATE NOTE -->
+<div class="create-note" 
+     [class.expanded]="isExpanded"
+     (click)="expandBox()" 
+     [style.backgroundColor]="selectedColor">
+  
+  <!-- Title input - only shows in expanded mode -->
+  <input *ngIf="isExpanded" 
+         class="note-input title-input" 
+         type="text" 
+         placeholder="Title" 
+         [(ngModel)]="title"
+         (click)="$event.stopPropagation()">
 
-  <!-- ✅ ERROR MESSAGE -->
-  <div class="error-message" *ngIf="error">{{ error }}</div>
-
-  <!-- ✅ GOOGLE KEEP CREATE NOTE -->
-  <div class="create-note" (click)="expandBox()" [style.backgroundColor]="selectedColor">
-
-    <!-- title shows only in expanded mode -->
-    <input
-      *ngIf="isExpanded"
-      class="note-input title-input"
-      type="text"
-      placeholder="Title"
-      [(ngModel)]="title"
-      (click)="$event.stopPropagation()"
-    />
-
-    <!-- description + icons row -->
-    <div class="note-row">
-      <textarea
-        class="note-input desc-input"
-        placeholder="Take a note..."
-        [(ngModel)]="description"
-        rows="1"
-        (click)="$event.stopPropagation()"
-      ></textarea>
-
-      <div class="note-icons" *ngIf="isExpanded">
-        <span class="material-symbols-outlined" title="Checklist">check_box</span>
-        <span class="material-symbols-outlined" title="Drawing">brush</span>
-        <label for="image-upload" class="image-label">
-          <span class="material-symbols-outlined" title="Add image">image</span>
-          <input 
-            type="file" 
-            id="image-upload" 
-            accept="image/*" 
-            (change)="onImageSelected($event)"
-            style="display: none;"
-          />
-        </label>
-      </div>
+  <!-- Main content row -->
+  <div class="note-row">
+    <textarea 
+      class="note-input desc-input" 
+      [placeholder]="isExpanded ? 'Take a note...' : 'Take a note...'"
+      [(ngModel)]="description" 
+      [rows]="isExpanded ? 3 : 1"
+      (click)="$event.stopPropagation()"></textarea>
+    
+    <!-- Icons for collapsed state -->
+    <div class="note-icons" *ngIf="!isExpanded">
+      <span class="material-symbols-outlined icon-btn" title="New list">check_box</span>
+      <span class="material-symbols-outlined icon-btn" title="New note with drawing">brush</span>
+      <span class="material-symbols-outlined icon-btn" title="New note with image">image</span>
     </div>
+  </div>
 
-    <!-- image preview -->
+  <!-- Expanded mode content -->
+  <div *ngIf="isExpanded" (click)="$event.stopPropagation()">
+    <!-- Image preview -->
     <div class="image-preview" *ngIf="imagePreview">
-      <img [src]="imagePreview" alt="Preview" />
+      <img [src]="imagePreview" alt="Preview">
+      <span class="remove-image" (click)="removeImage()">&times;</span>
     </div>
 
-    <!-- color picker - shows only if expanded -->
-    <div class="color-picker" *ngIf="isExpanded" (click)="$event.stopPropagation()">
-      <div 
-        *ngFor="let color of colorPalette"
-        class="color-option"
-        [style.backgroundColor]="color"
-        (click)="changeColor(color)"
-        [class.selected]="selectedColor === color"
-        title="Change color"
-      ></div>
-    </div>
-
-    <!-- toolbar - shows only if expanded -->
-    <div class="note-toolbar" *ngIf="isExpanded" (click)="$event.stopPropagation()">
+    <!-- Bottom toolbar -->
+    <div class="note-toolbar">
       <div class="toolbar-left">
-        <span class="material-symbols-outlined" title="Add reminder">schedule</span>
-        <span class="material-symbols-outlined" title="Add collaborator">group_add</span>
+        <!-- Main actions -->
+        <span class="material-symbols-outlined icon-btn" title="Remind me">notifications</span>
+        <span class="material-symbols-outlined icon-btn" title="Collaborator">person_add</span>
+        <span class="material-symbols-outlined icon-btn" title="Background options">palette</span>
+        
+        <label for="image-upload" class="icon-btn image-label">
+          <span class="material-symbols-outlined" title="Add image">image</span>
+          <input type="file" 
+                 id="image-upload" 
+                 accept="image/*" 
+                 (change)="onImageSelected($event)" 
+                 style="display: none">
+        </label>
+        
+        <span class="material-symbols-outlined icon-btn" title="Archive">archive</span>
+        <span class="material-symbols-outlined icon-btn" title="More">more_vert</span>
+        
+        <!-- Divider -->
+        <div class="divider"></div>
+        
+        <!-- Undo/Redo -->
+        <span class="material-symbols-outlined icon-btn" title="Undo">undo</span>
+        <span class="material-symbols-outlined icon-btn" title="Redo">redo</span>
+        
+        <!-- Divider -->
+        <div class="divider"></div>
+        
+        <!-- Formatting -->
+        <span class="material-symbols-outlined icon-btn" title="Text formatting">format_size</span>
       </div>
-      <button class="save-btn" (click)="saveAndClose()">Save</button>
+      
+      <button class="close-btn" (click)="saveAndClose()">Close</button>
     </div>
-
   </div>
+</div>
 
-  <!-- ✅ LOADING STATE -->
-  <div class="loading" *ngIf="loading">Loading notes...</div>
-
-  <!-- ✅ NOTES DISPLAY GRID -->
-  <div class="notes-grid">
-    <div 
-      class="note-box" 
-      *ngFor="let note of notes"
-      [style.backgroundColor]="note.color || '#FFFFFF'"
-      [class.archived]="note.isArchived"
-    >
-      <div class="note-content" (click)="editNote(note, $event)">
-        <h4 *ngIf="note.title" class="note-title">{{ note.title }}</h4>
-        <p *ngIf="note.description" class="note-description">{{ note.description }}</p>
-        <img *ngIf="note.imageUrl" [src]="note.imageUrl" class="note-image" />
-      </div>
-
+<!-- NOTES GRID -->
+<div class="notes-container">
+  <div class="notes-grid" *ngIf="notes && notes.length > 0">
+    <div class="note-item" 
+         *ngFor="let note of notes" 
+         [style.backgroundColor]="note.color || '#ffffff'">
+      
       <!-- Pin indicator -->
-      <span 
-        class="material-symbols-outlined pin-icon" 
-        *ngIf="note.isPinned"
-        title="Unpinned"
-      >
-        keep
-      </span>
-
-      <!-- Note toolbar -->
-      <div class="note-toolbar-bottom">
-        <span class="material-symbols-outlined" title="Remind me">schedule</span>
-        <span class="material-symbols-outlined" title="Collaborator">group_add</span>
-        <span class="material-symbols-outlined" title="Add color">palette</span>
-        <div class="more-menu">
-          <span class="material-symbols-outlined menu-trigger">more_vert</span>
-          <div class="more-options">
-            <div class="option-group">
-              <div class="color-row">
-                <div 
-                  *ngFor="let color of colorPalette"
-                  class="color-dot"
-                  [style.backgroundColor]="color"
-                  (click)="changeNoteColor(note.id!, color, $event)"
-                  title="Change color"
-                ></div>
-              </div>
-            </div>
-            <hr />
-            <div class="option-item" title="Archive">
-              <span class="material-symbols-outlined">archive</span>
-              <span (click)="archiveNote(note.id!, $event)">Archive</span>
-            </div>
-            <div class="option-item" title="Add label">
-              <span class="material-symbols-outlined">label</span>
-              <span>Add label</span>
-            </div>
-            <div class="option-item" title="Add drawing">
-              <span class="material-symbols-outlined">edit</span>
-              <span>Add drawing</span>
-            </div>
-            <div class="option-item" title="Make a copy">
-              <span class="material-symbols-outlined">content_copy</span>
-              <span>Make a copy</span>
-            </div>
-            <div class="option-item" title="Show checkboxes">
-              <span class="material-symbols-outlined">check_box</span>
-              <span>Show checkboxes</span>
-            </div>
-            <div class="option-item" title="Copy to Google Docs">
-              <span class="material-symbols-outlined">file_open</span>
-              <span>Copy to Google Docs</span>
-            </div>
-            <div class="option-item" title="Version history">
-              <span class="material-symbols-outlined">history</span>
-              <span>Version history</span>
-            </div>
-            <hr />
-            <div class="option-item delete" title="Delete">
-              <span class="material-symbols-outlined">delete</span>
-              <span (click)="deleteNote(note.id!, $event)">Delete note</span>
-            </div>
-          </div>
-        </div>
+      <span class="pin-icon material-symbols-outlined" *ngIf="note.isPinned">push_pin</span>
+      
+      <!-- Note content -->
+      <div class="note-content" (click)="editNote(note, $event)">
+        <h3 class="note-title" *ngIf="note.title && note.title.trim()">{{ note.title }}</h3>
+        <p class="note-description" *ngIf="note.content">{{ note.content }}</p>
+      </div>
+      
+      <!-- Note footer (visible on hover) -->
+      <div class="note-footer-hover">
+        <span class="material-symbols-outlined icon-btn-small" 
+              (click)="$event.stopPropagation()" 
+              title="Remind me">notifications</span>
+        <span class="material-symbols-outlined icon-btn-small" 
+              (click)="$event.stopPropagation()" 
+              title="Collaborator">person_add</span>
+        <span class="material-symbols-outlined icon-btn-small" 
+              (click)="$event.stopPropagation()" 
+              title="Background options">palette</span>
+        <span class="material-symbols-outlined icon-btn-small" 
+              (click)="$event.stopPropagation()" 
+              title="Add image">image</span>
+        <span class="material-symbols-outlined icon-btn-small" 
+              (click)="archiveNote(note.id, $event)" 
+              title="Archive">archive</span>
+        <span class="material-symbols-outlined icon-btn-small" 
+              (click)="deleteNote(note.id, $event)" 
+              title="Delete">delete</span>
       </div>
     </div>
   </div>
-
+  
+  <!-- Empty state -->
+  <div class="empty-state" *ngIf="!notes || notes.length === 0">
+    <span class="material-symbols-outlined empty-icon">lightbulb</span>
+    <p class="empty-text">Notes you add appear here</p>
+  </div>
 </div>

@@ -1,119 +1,72 @@
-import { Injectable } from '@angular/core';
-import { ApiService } from './api.service';
-import { Observable } from 'rxjs';
+import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { PLATFORM_ID, inject } from '@angular/core';
-
-export interface RegisterRequest {
-  fullName: string;
-  email: string;
-  password: string;
-}
-
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface VerifyOtpRequest {
-  email: string;
-  otp: string;
-  purpose: 'REGISTER' | 'LOGIN' | 'FORGOT_PASSWORD';
-}
-
-export interface AuthResponse {
-  message: string;
-  token?: string;
-}
-
-export interface ForgotPasswordRequest {
-  email: string;
-}
-
-export interface ResetPasswordRequest {
-  email: string;
-  otp: string;
-  newPassword: string;
-}
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { ApiService } from './api.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private platformId = inject(PLATFORM_ID);
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {}
 
-  /**
-   * Register user
-   */
-  register(request: RegisterRequest): Observable<AuthResponse> {
-    return this.apiService.post<AuthResponse>('/auth/register', request);
+  private isBrowser(): boolean {
+    return isPlatformBrowser(this.platformId);
   }
 
-  /**
-   * Login user
-   */
-  login(request: LoginRequest): Observable<AuthResponse> {
-    return this.apiService.post<AuthResponse>('/auth/login', request);
+  register(data: { fullName: string; email: string; password: string }): Observable<any> {
+    return this.apiService.post('auth/register', data);
   }
 
-  /**
-   * Verify OTP
-   */
-  verifyOtp(request: VerifyOtpRequest): Observable<AuthResponse> {
-    return this.apiService.post<AuthResponse>('/auth/verify-otp', request);
+  login(data: { email: string; password: string }): Observable<any> {
+    return this.apiService.post('auth/login', data);
   }
 
-  /**
-   * Forgot password - sends OTP to email
-   */
-  forgotPassword(request: ForgotPasswordRequest): Observable<AuthResponse> {
-    return this.apiService.post<AuthResponse>('/auth/forgot-password', request);
+  verifyOtp(data: { email: string; otp: string; purpose: string }): Observable<any> {
+    return this.apiService.post('auth/verify-otp', data).pipe(
+      tap((response: any) => {
+        if (response.token) {
+          this.saveToken(response.token);
+        }
+      })
+    );
   }
 
-  /**
-   * Reset password with OTP
-   */
-  resetPassword(request: ResetPasswordRequest): Observable<AuthResponse> {
-    return this.apiService.post<AuthResponse>('/auth/reset-password', request);
+  forgotPassword(data: { email: string }): Observable<any> {
+    return this.apiService.post('auth/forgot-password', data);
   }
 
-  /**
-   * Save token to localStorage
-   */
+  resetPassword(data: { email: string; otp: string; newPassword: string }): Observable<any> {
+    return this.apiService.post('auth/reset-password', data);
+  }
+
   saveToken(token: string): void {
-    if (isPlatformBrowser(this.platformId)) {
+    if (this.isBrowser()) {
       localStorage.setItem('token', token);
     }
   }
 
-  /**
-   * Get token from localStorage
-   */
-  getToken(): string | null {
-    if (isPlatformBrowser(this.platformId)) {
-      return localStorage.getItem('token');
+  logout(): void {
+    if (this.isBrowser()) {
+      localStorage.removeItem('token');
     }
-    return null;
   }
 
-  /**
-   * Check if user is authenticated
-   */
   isAuthenticated(): boolean {
-    if (isPlatformBrowser(this.platformId)) {
-      return !!this.getToken();
+    if (this.isBrowser()) {
+      return !!localStorage.getItem('token');
     }
     return false;
   }
 
-  /**
-   * Logout user
-   */
-  logout(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.removeItem('token');
+  getToken(): string | null {
+    if (this.isBrowser()) {
+      return localStorage.getItem('token');
     }
+    return null;
   }
 }
