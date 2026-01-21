@@ -143,7 +143,31 @@
         <div class="note-footer-hover">
           <span class="material-symbols-outlined icon-btn-small" (click)="$event.stopPropagation()" title="Remind me">add_alert</span>
           <span class="material-symbols-outlined icon-btn-small" (click)="$event.stopPropagation()" title="Collaborator">person_add</span>
-          <span class="material-symbols-outlined icon-btn-small" (click)="$event.stopPropagation()" title="Background options">palette</span>
+          
+          <!-- Color palette for note -->
+          <div class="note-color-palette-container">
+            <span 
+              class="material-symbols-outlined icon-btn-small" 
+              (click)="toggleNotePalette(note.id, $event)" 
+              title="Background options"
+            >palette</span>
+            
+            <div class="note-color-palette" *ngIf="activeColorPaletteNoteId === note.id" (click)="$event.stopPropagation()">
+              <div
+                *ngFor="let color of colors"
+                class="color-option-small"
+                [style.backgroundColor]="color"
+                [class.selected]="note.color === color"
+                (click)="changeNoteColor(note.id, color, $event)"
+                [title]="color === '#ffffff' ? 'Default' : 'Color'"
+              >
+                <span class="material-symbols-outlined check-icon-small" *ngIf="note.color === color">
+                  check
+                </span>
+              </div>
+            </div>
+          </div>
+          
           <span class="material-symbols-outlined icon-btn-small" (click)="$event.stopPropagation()" title="Add image">image</span>
           <span class="material-symbols-outlined icon-btn-small" (click)="archiveNote(note.id, $event)" title="Archive">archive</span>
           <span class="material-symbols-outlined icon-btn-small" (click)="deleteNote(note.id, $event)" title="Delete">delete</span>
@@ -183,7 +207,31 @@
         <div class="note-footer-hover">
           <span class="material-symbols-outlined icon-btn-small" (click)="$event.stopPropagation()" title="Remind me">add_alert</span>
           <span class="material-symbols-outlined icon-btn-small" (click)="$event.stopPropagation()" title="Collaborator">person_add</span>
-          <span class="material-symbols-outlined icon-btn-small" (click)="$event.stopPropagation()" title="Background options">palette</span>
+          
+          <!-- Color palette for note -->
+          <div class="note-color-palette-container">
+            <span 
+              class="material-symbols-outlined icon-btn-small" 
+              (click)="toggleNotePalette(note.id, $event)" 
+              title="Background options"
+            >palette</span>
+            
+            <div class="note-color-palette" *ngIf="activeColorPaletteNoteId === note.id" (click)="$event.stopPropagation()">
+              <div
+                *ngFor="let color of colors"
+                class="color-option-small"
+                [style.backgroundColor]="color"
+                [class.selected]="note.color === color"
+                (click)="changeNoteColor(note.id, color, $event)"
+                [title]="color === '#ffffff' ? 'Default' : 'Color'"
+              >
+                <span class="material-symbols-outlined check-icon-small" *ngIf="note.color === color">
+                  check
+                </span>
+              </div>
+            </div>
+          </div>
+          
           <span class="material-symbols-outlined icon-btn-small" (click)="$event.stopPropagation()" title="Add image">image</span>
           <span class="material-symbols-outlined icon-btn-small" (click)="archiveNote(note.id, $event)" title="Archive">archive</span>
           <span class="material-symbols-outlined icon-btn-small" (click)="deleteNote(note.id, $event)" title="Delete">delete</span>

@@ -9,7 +9,7 @@ namespace BusinessLayer.Interfaces
     {
         Task<List<NoteResponseDto>> GetAllAsync(int userId);
         Task<NoteResponseDto> GetByIdAsync(int noteId, int userId);
-        Task CreateAsync(CreateNoteDto dto, int userId);
+        Task<NoteResponseDto> CreateAsync(CreateNoteDto dto, int userId);
         Task UpdateAsync(int noteId, UpdateNoteDto dto, int userId);
         Task DeleteAsync(int noteId, int userId);
         Task<List<NoteResponseDto>> SearchAsync(string keyword, int userId);

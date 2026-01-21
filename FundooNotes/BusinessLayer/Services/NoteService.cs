@@ -49,7 +49,7 @@ namespace BusinessLayer.Services
             };
         }
 
-        public async Task CreateAsync(CreateNoteDto dto, int userId)
+        public async Task<NoteResponseDto> CreateAsync(CreateNoteDto dto, int userId)
         {
             var note = new Note
             {
@@ -59,6 +59,18 @@ namespace BusinessLayer.Services
             };
 
             await _noteRepo.AddAsync(note);
+
+            return new NoteResponseDto
+            {
+                Id = note.Id,
+                Title = note.Title,
+                Content = note.Content,
+                Color = note.Color,
+                IsPinned = note.IsPinned,
+                IsArchived = note.IsArchived,
+                CreatedAt = note.CreatedAt,
+                UpdatedAt = note.UpdatedAt
+            };
         }
 
         public async Task UpdateAsync(int noteId, UpdateNoteDto dto, int userId)

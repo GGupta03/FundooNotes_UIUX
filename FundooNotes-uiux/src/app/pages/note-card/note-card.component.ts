@@ -32,6 +32,7 @@ export class NoteCardComponent implements OnInit {
   selectedColor = '#ffffff';
   imagePreview: string | null = null;
   showColorPalette = false;
+  activeColorPaletteNoteId: number | null = null;
 
   notes: Note[] = [];
   pinnedNotes: Note[] = [];
@@ -75,6 +76,11 @@ export class NoteCardComponent implements OnInit {
     this.showColorPalette = !this.showColorPalette;
   }
 
+  toggleNotePalette(noteId: number, event: Event): void {
+    event.stopPropagation();
+    this.activeColorPaletteNoteId = this.activeColorPaletteNoteId === noteId ? null : noteId;
+  }
+
   selectColor(color: string, event: Event): void {
     event.stopPropagation();
     this.selectedColor = color;
@@ -103,7 +109,7 @@ export class NoteCardComponent implements OnInit {
   saveAndClose(): void {
     if (this.title.trim() || this.description.trim()) {
       const noteData = {
-        title: this.title,
+        title: this.title || 'Untitled',
         content: this.description
       };
 
@@ -111,9 +117,12 @@ export class NoteCardComponent implements OnInit {
         next: (response: any) => {
           console.log('Note created successfully', response);
           
+          // Extract ID from response - handle both direct ID and nested response
+          let noteId = response.id || response.data?.id || response.noteId;
+          
           // If color is not default white, update the color
-          if (this.selectedColor !== '#ffffff' && response.id) {
-            this.changeNoteColor(response.id, this.selectedColor, false);
+          if (this.selectedColor !== '#ffffff' && noteId) {
+            this.changeNoteColorAndReload(noteId);
           } else {
             this.loadNotes();
           }
@@ -122,12 +131,31 @@ export class NoteCardComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error creating note', err);
-          alert('Failed to create note. Please try again.');
+          if (err.status === 401) {
+            this.authService.logout();
+            this.router.navigate(['/login']);
+          } else {
+            alert('Failed to create note. Please try again.');
+          }
         }
       });
     } else {
       this.resetForm();
     }
+  }
+
+  changeNoteColorAndReload(noteId: number, color?: string): void {
+    const colorToApply = color || this.selectedColor;
+    this.noteService.changeNoteColor(noteId, colorToApply).subscribe({
+      next: () => {
+        console.log('Color updated successfully');
+        this.loadNotes();
+      },
+      error: (err) => {
+        console.error('Error changing color', err);
+        this.loadNotes();
+      }
+    });
   }
 
   resetForm(): void {
@@ -197,37 +225,49 @@ export class NoteCardComponent implements OnInit {
 
   updateNote(noteId: number, data: any): void {
     const updateData = {
-      title: data.title,
+      title: data.title || 'Untitled',
       content: data.content
     };
 
     this.noteService.updateNote(noteId, updateData).subscribe({
       next: () => {
-        // If color changed, update color separately
+        console.log('Note updated successfully');
+        // Always update color if color is provided from dialog
         if (data.color) {
-          this.changeNoteColor(noteId, data.color);
+          this.changeNoteColorAndReload(noteId, data.color);
         } else {
           this.loadNotes();
         }
       },
       error: (err) => {
         console.error('Error updating note', err);
-        alert('Failed to update note. Please try again.');
+        if (err.status === 401) {
+          this.authService.logout();
+          this.router.navigate(['/login']);
+        } else {
+          alert('Failed to update note. Please try again.');
+          this.loadNotes();
+        }
       }
     });
   }
 
-  changeNoteColor(noteId: number, color: string, reload: boolean = true): void {
+  changeNoteColor(noteId: number, color: string, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    
     this.noteService.changeNoteColor(noteId, color).subscribe({
       next: () => {
         console.log('Color updated successfully');
-        if (reload) {
-          this.loadNotes();
-        }
+        this.loadNotes();
       },
       error: (err) => {
         console.error('Error changing color', err);
-        if (reload) {
+        if (err.status === 401) {
+          this.authService.logout();
+          this.router.navigate(['/login']);
+        } else {
           this.loadNotes();
         }
       }
@@ -262,14 +302,21 @@ export class NoteCardComponent implements OnInit {
 
   deleteNote(noteId: number, event: Event): void {
     event.stopPropagation();
-    if (confirm('Are you sure you want to delete this note?')) {
+    if (confirm('Are you sure you want to delete this note? It will be moved to Trash.')) {
       this.noteService.deleteNote(noteId).subscribe({
         next: () => {
-          console.log('Note deleted');
+          console.log('Note deleted successfully');
           this.loadNotes();
         },
         error: (err) => {
           console.error('Error deleting note', err);
+          if (err.status === 401) {
+            this.authService.logout();
+            this.router.navigate(['/login']);
+          } else {
+            alert('Failed to delete note. Please try again.');
+            this.loadNotes();
+          }
         }
       });
     }

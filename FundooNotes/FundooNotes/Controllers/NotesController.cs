@@ -67,8 +67,8 @@ namespace FundooNotes.Controllers
                     return BadRequest(new { message = "Note data is required" });
                 }
 
-                await _noteService.CreateAsync(dto, GetUserId());
-                return Ok(new { message = "Note created successfully" });
+                var result = await _noteService.CreateAsync(dto, GetUserId());
+                return Ok(result);
             }
             catch (Exception ex)
             {
