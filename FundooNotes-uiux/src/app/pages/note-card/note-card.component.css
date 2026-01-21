@@ -8,7 +8,7 @@
 /* Create Note Section */
 .create-note {
   max-width: 600px;
-  margin: 32px auto 20px auto;
+  margin: 32px auto 40px auto;
   background: #ffffff;
   border-radius: 8px;
   padding: 12px 16px;
@@ -173,14 +173,6 @@
   cursor: pointer;
 }
 
-/* Divider */
-.divider {
-  width: 1px;
-  height: 24px;
-  background-color: #dadce0;
-  margin: 0 8px;
-}
-
 /* Close Button */
 .close-btn {
   background: transparent;
@@ -256,6 +248,17 @@
   max-width: 1280px;
   margin: 0 auto;
   padding: 0 16px;
+}
+
+/* Section Title */
+.section-title {
+  font-size: 11px;
+  font-weight: 500;
+  color: #5f6368;
+  letter-spacing: 0.8px;
+  margin: 16px 0 8px 0;
+  padding: 0 0 8px 0;
+  text-transform: uppercase;
 }
 
 /* Error Alert */
@@ -341,13 +344,12 @@
   100% { transform: rotate(360deg); }
 }
 
-/* Notes Grid */
+/* Notes Grid - Masonry Layout like Google Keep */
 .notes-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 16px;
   padding: 16px 0;
-  margin-top: 16px;
 }
 
 /* Note Item */
@@ -373,19 +375,36 @@
   opacity: 1;
 }
 
+.note-item:hover .pin-icon {
+  opacity: 1;
+}
+
+/* Note Header with Pin */
+.note-header {
+  display: flex;
+  justify-content: flex-end;
+  margin: -4px -4px 0 0;
+  min-height: 24px;
+}
+
 /* Pin Icon */
 .pin-icon {
-  position: absolute;
-  top: 8px;
-  right: 8px;
   font-size: 18px;
   color: rgba(0, 0, 0, 0.54);
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s, background-color 0.2s;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
 }
 
-.note-item:hover .pin-icon {
+.pin-icon:hover {
+  background-color: rgba(95, 99, 104, 0.157);
+}
+
+.pin-icon.pinned {
   opacity: 1;
+  color: rgba(0, 0, 0, 0.87);
 }
 
 /* Note Content */
@@ -481,9 +500,5 @@
 @media (max-width: 480px) {
   .notes-grid {
     grid-template-columns: 1fr;
-  }
-
-  .toolbar-left .divider {
-    display: none;
   }
 }

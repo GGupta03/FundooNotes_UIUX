@@ -34,13 +34,24 @@ export class NoteCardComponent implements OnInit {
   showColorPalette = false;
 
   notes: Note[] = [];
+  pinnedNotes: Note[] = [];
+  otherNotes: Note[] = [];
   isLoading = false;
   errorMessage: string | null = null;
 
   colors: string[] = [
-    '#ffffff', '#f28b82', '#fbbc04', '#fff475',
-    '#ccff90', '#a7ffeb', '#cbf0f8', '#aecbfa',
-    '#d7aefb', '#fdcfe8', '#e6c9a8', '#e8eaed'
+    '#ffffff', // Default white
+    '#f28b82', // Red
+    '#fbbc04', // Orange
+    '#fff475', // Yellow
+    '#ccff90', // Green
+    '#a7ffeb', // Teal
+    '#cbf0f8', // Cyan
+    '#aecbfa', // Blue
+    '#d7aefb', // Purple
+    '#fdcfe8', // Pink
+    '#e6c9a8', // Brown
+    '#e8eaed'  // Gray
   ];
 
   constructor(
@@ -59,11 +70,13 @@ export class NoteCardComponent implements OnInit {
     this.isExpanded = true;
   }
 
-  toggleColorPalette(): void {
+  toggleColorPalette(event: Event): void {
+    event.stopPropagation();
     this.showColorPalette = !this.showColorPalette;
   }
 
-  selectColor(color: string): void {
+  selectColor(color: string, event: Event): void {
+    event.stopPropagation();
     this.selectedColor = color;
     this.showColorPalette = false;
   }
@@ -91,14 +104,20 @@ export class NoteCardComponent implements OnInit {
     if (this.title.trim() || this.description.trim()) {
       const noteData = {
         title: this.title,
-        content: this.description,
-        color: this.selectedColor
+        content: this.description
       };
 
       this.noteService.createNote(noteData).subscribe({
-        next: (response) => {
+        next: (response: any) => {
           console.log('Note created successfully', response);
-          this.loadNotes();
+          
+          // If color is not default white, update the color
+          if (this.selectedColor !== '#ffffff' && response.id) {
+            this.changeNoteColor(response.id, this.selectedColor, false);
+          } else {
+            this.loadNotes();
+          }
+          
           this.resetForm();
         },
         error: (err) => {
@@ -127,11 +146,18 @@ export class NoteCardComponent implements OnInit {
     this.noteService.getAllNotes().subscribe({
       next: (data: any) => {
         this.notes = data.filter((note: any) => !note.isArchived);
+        
+        // Separate pinned and other notes
+        this.pinnedNotes = this.notes.filter(note => note.isPinned);
+        this.otherNotes = this.notes.filter(note => !note.isPinned);
+        
         this.isLoading = false;
       },
       error: (err) => {
         console.error('Error loading notes', err);
         this.notes = [];
+        this.pinnedNotes = [];
+        this.otherNotes = [];
         this.isLoading = false;
 
         if (err.status === 401) {
@@ -164,7 +190,6 @@ export class NoteCardComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Update note with new data
         this.updateNote(note.id, result);
       }
     });
@@ -192,14 +217,32 @@ export class NoteCardComponent implements OnInit {
     });
   }
 
-  changeNoteColor(noteId: number, color: string): void {
+  changeNoteColor(noteId: number, color: string, reload: boolean = true): void {
     this.noteService.changeNoteColor(noteId, color).subscribe({
       next: () => {
         console.log('Color updated successfully');
-        this.loadNotes();
+        if (reload) {
+          this.loadNotes();
+        }
       },
       error: (err) => {
         console.error('Error changing color', err);
+        if (reload) {
+          this.loadNotes();
+        }
+      }
+    });
+  }
+
+  togglePin(noteId: number, event: Event): void {
+    event.stopPropagation();
+    this.noteService.pinNote(noteId).subscribe({
+      next: () => {
+        console.log('Note pin status toggled');
+        this.loadNotes();
+      },
+      error: (err) => {
+        console.error('Error toggling pin', err);
       }
     });
   }
