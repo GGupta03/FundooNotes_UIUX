@@ -78,7 +78,27 @@
 
 <!-- NOTES GRID -->
 <div class="notes-container">
-  <div class="notes-grid" *ngIf="notes && notes.length > 0">
+  <!-- Error message alert -->
+  <div class="error-alert" *ngIf="errorMessage">
+    <div class="error-content">
+      <span class="material-symbols-outlined error-icon">error</span>
+      <div class="error-text">
+        <strong>Error:</strong> {{ errorMessage }}
+      </div>
+      <div class="error-actions">
+        <button class="retry-btn" (click)="loadNotes()" *ngIf="!errorMessage.includes('Session expired')">Retry</button>
+        <button class="login-btn" (click)="goToLogin()" *ngIf="errorMessage.includes('Session expired')">Go to Login</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading indicator -->
+  <div class="loading-indicator" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading notes...</p>
+  </div>
+
+  <div class="notes-grid" *ngIf="notes && notes.length > 0 && !isLoading">
     <div class="note-item" 
          *ngFor="let note of notes" 
          [style.backgroundColor]="note.color || '#ffffff'">
@@ -117,7 +137,7 @@
   </div>
   
   <!-- Empty state -->
-  <div class="empty-state" *ngIf="!notes || notes.length === 0">
+  <div class="empty-state" *ngIf="!notes || (notes.length === 0 && !isLoading && !errorMessage)">
     <span class="material-symbols-outlined empty-icon">lightbulb</span>
     <p class="empty-text">Notes you add appear here</p>
   </div>

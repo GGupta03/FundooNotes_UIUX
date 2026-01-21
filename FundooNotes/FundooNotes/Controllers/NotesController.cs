@@ -32,36 +32,76 @@ namespace FundooNotes.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var notes = await _noteService.GetAllAsync(GetUserId());
-            return Ok(notes);
+            try
+            {
+                var notes = await _noteService.GetAllAsync(GetUserId());
+                return Ok(notes);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = $"Error fetching notes: {ex.Message}" });
+            }
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var note = await _noteService.GetByIdAsync(id, GetUserId());
-            return Ok(note);
+            try
+            {
+                var note = await _noteService.GetByIdAsync(id, GetUserId());
+                return Ok(note);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { message = $"Note not found: {ex.Message}" });
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(CreateNoteDto dto)
         {
-            await _noteService.CreateAsync(dto, GetUserId());
-            return Ok("Note created successfully");
+            try
+            {
+                if (dto == null)
+                {
+                    return BadRequest(new { message = "Note data is required" });
+                }
+
+                await _noteService.CreateAsync(dto, GetUserId());
+                return Ok(new { message = "Note created successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = $"Error creating note: {ex.Message}" });
+            }
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateNoteDto dto)
         {
-            await _noteService.UpdateAsync(id, dto, GetUserId());
-            return Ok("Note updated successfully");
+            try
+            {
+                await _noteService.UpdateAsync(id, dto, GetUserId());
+                return Ok(new { message = "Note updated successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = $"Error updating note: {ex.Message}" });
+            }
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            await _noteService.DeleteAsync(id, GetUserId());
-            return Ok("Note deleted successfully");
+            try
+            {
+                await _noteService.DeleteAsync(id, GetUserId());
+                return Ok(new { message = "Note deleted successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = $"Error deleting note: {ex.Message}" });
+            }
         }
 
         // ---------------- ADVANCED NOTES ----------------
@@ -76,15 +116,29 @@ namespace FundooNotes.Controllers
         [HttpPatch("{id}/pin")]
         public async Task<IActionResult> Pin(int id)
         {
-            await _noteService.PinAsync(id, GetUserId());
-            return Ok("Pin status updated");
+            try
+            {
+                await _noteService.PinAsync(id, GetUserId());
+                return Ok(new { message = "Pin status updated" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = $"Error updating pin status: {ex.Message}" });
+            }
         }
 
         [HttpPatch("{id}/archive")]
         public async Task<IActionResult> Archive(int id)
         {
-            await _noteService.ArchiveAsync(id, GetUserId());
-            return Ok("Archive status updated");
+            try
+            {
+                await _noteService.ArchiveAsync(id, GetUserId());
+                return Ok(new { message = "Archive status updated" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = $"Error updating archive status: {ex.Message}" });
+            }
         }
 
         [HttpPatch("{id}/color")]
