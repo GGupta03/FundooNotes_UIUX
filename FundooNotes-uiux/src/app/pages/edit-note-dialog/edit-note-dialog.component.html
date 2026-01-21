@@ -1,0 +1,67 @@
+<div class="edit-dialog">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>Edit Note</h2>
+    <button class="close-icon-btn" (click)="onCancel()" type="button">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    <!-- Title Input -->
+    <input
+      class="note-input title-input"
+      type="text"
+      placeholder="Title"
+      [(ngModel)]="editedTitle"
+    />
+
+    <!-- Content Textarea -->
+    <textarea
+      class="note-input content-input"
+      placeholder="Take a note..."
+      [(ngModel)]="editedContent"
+      rows="8"
+    ></textarea>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="dialog-actions">
+    <!-- Color Palette -->
+    <div class="action-buttons">
+      <div class="color-palette-container">
+        <button
+          class="icon-btn"
+          type="button"
+          (click)="toggleColorPalette()"
+          title="Background options"
+        >
+          <span class="material-symbols-outlined">palette</span>
+        </button>
+
+        <!-- Color Palette Dropdown -->
+        <div class="color-palette" *ngIf="showColorPalette">
+          <div
+            *ngFor="let color of colors"
+            class="color-option"
+            [style.backgroundColor]="color"
+            [class.selected]="selectedColor === color"
+            (click)="selectColor(color)"
+          >
+            <span class="material-symbols-outlined check-icon" *ngIf="selectedColor === color">
+              check
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <button class="icon-btn" type="button" title="Archive">
+        <span class="material-symbols-outlined">archive</span>
+      </button>
+
+      <button class="icon-btn" type="button" title="More">
+        <span class="material-symbols-outlined">more_vert</span>
+      </button>
+    </div>
+
+    <button class="close-btn" type="button" (click)="onSave()">Close</button>
+  </mat-dialog-actions>
+</div>

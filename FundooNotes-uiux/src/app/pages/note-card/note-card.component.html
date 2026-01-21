@@ -1,29 +1,33 @@
 <!-- GOOGLE KEEP CREATE NOTE -->
-<div class="create-note" 
-     [class.expanded]="isExpanded"
-     (click)="expandBox()" 
-     [style.backgroundColor]="selectedColor">
-  
+<div
+  class="create-note"
+  [class.expanded]="isExpanded"
+  (click)="expandBox()"
+  [style.backgroundColor]="selectedColor"
+>
   <!-- Title input - only shows in expanded mode -->
-  <input *ngIf="isExpanded" 
-         class="note-input title-input" 
-         type="text" 
-         placeholder="Title" 
-         [(ngModel)]="title"
-         (click)="$event.stopPropagation()">
+  <input
+    *ngIf="isExpanded"
+    class="note-input title-input"
+    type="text"
+    placeholder="Title"
+    [(ngModel)]="title"
+    (click)="$event.stopPropagation()"
+  />
 
   <!-- Main content row -->
   <div class="note-row">
-    <textarea 
-      class="note-input desc-input" 
+    <textarea
+      class="note-input desc-input"
       [placeholder]="isExpanded ? 'Take a note...' : 'Take a note...'"
-      [(ngModel)]="description" 
+      [(ngModel)]="description"
       [rows]="isExpanded ? 3 : 1"
-      (click)="$event.stopPropagation()"></textarea>
-    
+      (click)="$event.stopPropagation()"
+    ></textarea>
+
     <!-- Icons for collapsed state -->
     <div class="note-icons" *ngIf="!isExpanded">
-      <span class="material-symbols-outlined icon-btn" title="New list">check_box</span>
+      <span class="material-symbols-outlined icon-btn" title="New list">checkbox</span>
       <span class="material-symbols-outlined icon-btn" title="New note with drawing">brush</span>
       <span class="material-symbols-outlined icon-btn" title="New note with image">image</span>
     </div>
@@ -33,8 +37,8 @@
   <div *ngIf="isExpanded" (click)="$event.stopPropagation()">
     <!-- Image preview -->
     <div class="image-preview" *ngIf="imagePreview">
-      <img [src]="imagePreview" alt="Preview">
-      <span class="remove-image" (click)="removeImage()">&times;</span>
+      <img [src]="imagePreview" alt="Preview" />
+      <span class="remove-image" (click)="removeImage()">×</span>
     </div>
 
     <!-- Bottom toolbar -->
@@ -43,48 +47,71 @@
         <!-- Main actions -->
         <span class="material-symbols-outlined icon-btn" title="Remind me">notifications</span>
         <span class="material-symbols-outlined icon-btn" title="Collaborator">person_add</span>
-        <span class="material-symbols-outlined icon-btn" title="Background options">palette</span>
         
+        <!-- Color Palette -->
+        <div class="color-palette-container">
+          <span 
+            class="material-symbols-outlined icon-btn" 
+            title="Background options"
+            (click)="toggleColorPalette()"
+          >palette</span>
+          
+          <div class="color-palette" *ngIf="showColorPalette">
+            <div
+              *ngFor="let color of colors"
+              class="color-option"
+              [style.backgroundColor]="color"
+              [class.selected]="selectedColor === color"
+              (click)="selectColor(color)"
+            >
+              <span class="material-symbols-outlined check-icon" *ngIf="selectedColor === color">
+                check
+              </span>
+            </div>
+          </div>
+        </div>
+
         <label for="image-upload" class="icon-btn image-label">
           <span class="material-symbols-outlined" title="Add image">image</span>
-          <input type="file" 
-                 id="image-upload" 
-                 accept="image/*" 
-                 (change)="onImageSelected($event)" 
-                 style="display: none">
+          <input
+            type="file"
+            id="image-upload"
+            accept="image/*"
+            (change)="onImageSelected($event)"
+            style="display: none;"
+          />
         </label>
-        
+
         <span class="material-symbols-outlined icon-btn" title="Archive">archive</span>
         <span class="material-symbols-outlined icon-btn" title="More">more_vert</span>
-        
+
         <!-- Divider -->
         <div class="divider"></div>
-        
+
         <!-- Undo/Redo -->
         <span class="material-symbols-outlined icon-btn" title="Undo">undo</span>
         <span class="material-symbols-outlined icon-btn" title="Redo">redo</span>
-        
+
         <!-- Divider -->
         <div class="divider"></div>
-        
+
         <!-- Formatting -->
         <span class="material-symbols-outlined icon-btn" title="Text formatting">format_size</span>
       </div>
-      
+
       <button class="close-btn" (click)="saveAndClose()">Close</button>
     </div>
   </div>
 </div>
 
+<!-- Rest of the HTML remains the same -->
 <!-- NOTES GRID -->
 <div class="notes-container">
   <!-- Error message alert -->
   <div class="error-alert" *ngIf="errorMessage">
     <div class="error-content">
       <span class="material-symbols-outlined error-icon">error</span>
-      <div class="error-text">
-        <strong>Error:</strong> {{ errorMessage }}
-      </div>
+      <div class="error-text"><strong>Error:</strong> {{ errorMessage }}</div>
       <div class="error-actions">
         <button class="retry-btn" (click)="loadNotes()" *ngIf="!errorMessage.includes('Session expired')">Retry</button>
         <button class="login-btn" (click)="goToLogin()" *ngIf="errorMessage.includes('Session expired')">Go to Login</button>
@@ -99,45 +126,34 @@
   </div>
 
   <div class="notes-grid" *ngIf="notes && notes.length > 0 && !isLoading">
-    <div class="note-item" 
-         *ngFor="let note of notes" 
-         [style.backgroundColor]="note.color || '#ffffff'">
-      
+    <div 
+      class="note-item" 
+      *ngFor="let note of notes" 
+      [style.backgroundColor]="note.color || '#ffffff'"
+    >
       <!-- Pin indicator -->
       <span class="pin-icon material-symbols-outlined" *ngIf="note.isPinned">push_pin</span>
-      
+
       <!-- Note content -->
       <div class="note-content" (click)="editNote(note, $event)">
         <h3 class="note-title" *ngIf="note.title && note.title.trim()">{{ note.title }}</h3>
         <p class="note-description" *ngIf="note.content">{{ note.content }}</p>
       </div>
-      
-      <!-- Note footer (visible on hover) -->
+
+      <!-- Note footer visible on hover -->
       <div class="note-footer-hover">
-        <span class="material-symbols-outlined icon-btn-small" 
-              (click)="$event.stopPropagation()" 
-              title="Remind me">notifications</span>
-        <span class="material-symbols-outlined icon-btn-small" 
-              (click)="$event.stopPropagation()" 
-              title="Collaborator">person_add</span>
-        <span class="material-symbols-outlined icon-btn-small" 
-              (click)="$event.stopPropagation()" 
-              title="Background options">palette</span>
-        <span class="material-symbols-outlined icon-btn-small" 
-              (click)="$event.stopPropagation()" 
-              title="Add image">image</span>
-        <span class="material-symbols-outlined icon-btn-small" 
-              (click)="archiveNote(note.id, $event)" 
-              title="Archive">archive</span>
-        <span class="material-symbols-outlined icon-btn-small" 
-              (click)="deleteNote(note.id, $event)" 
-              title="Delete">delete</span>
+        <span class="material-symbols-outlined icon-btn-small" (click)="$event.stopPropagation()" title="Remind me">notifications</span>
+        <span class="material-symbols-outlined icon-btn-small" (click)="$event.stopPropagation()" title="Collaborator">person_add</span>
+        <span class="material-symbols-outlined icon-btn-small" (click)="$event.stopPropagation()" title="Background options">palette</span>
+        <span class="material-symbols-outlined icon-btn-small" (click)="$event.stopPropagation()" title="Add image">image</span>
+        <span class="material-symbols-outlined icon-btn-small" (click)="archiveNote(note.id, $event)" title="Archive">archive</span>
+        <span class="material-symbols-outlined icon-btn-small" (click)="deleteNote(note.id, $event)" title="Delete">delete</span>
       </div>
     </div>
   </div>
-  
+
   <!-- Empty state -->
-  <div class="empty-state" *ngIf="!notes || (notes.length === 0 && !isLoading && !errorMessage)">
+  <div class="empty-state" *ngIf="!notes || notes.length === 0 && !isLoading && !errorMessage">
     <span class="material-symbols-outlined empty-icon">lightbulb</span>
     <p class="empty-text">Notes you add appear here</p>
   </div>

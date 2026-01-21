@@ -8,15 +8,15 @@ export const AuthGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const platformId = inject(PLATFORM_ID);
 
-  // Allow access on server-side rendering
-  if (!isPlatformBrowser(platformId)) {
+  // Check authentication on both server and browser
+  if (authService.isAuthenticated()) {
     return true;
   }
 
-  if (authService.isAuthenticated()) {
-    return true;
-  } else {
+  // Not authenticated - redirect to login
+  if (isPlatformBrowser(platformId)) {
     router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
-    return false;
   }
+  
+  return false;
 };

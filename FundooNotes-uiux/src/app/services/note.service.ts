@@ -35,11 +35,6 @@ export class NoteService {
     return this.apiService.post('notes', note);
   }
 
-  // Update note
-  updateNote(id: number, note: { title: string; content: string }): Observable<any> {
-    return this.apiService.put(`notes/${id}`, note);
-  }
-
   // Delete note
   deleteNote(id: number): Observable<any> {
     return this.apiService.delete(`notes/${id}`);
@@ -55,11 +50,6 @@ export class NoteService {
     return this.apiService.patch(`notes/${id}/archive`, {});
   }
 
-  // Change note color
-  changeNoteColor(id: number, color: string): Observable<any> {
-    return this.apiService.patch(`notes/${id}/color`, { color });
-  }
-
   // Search notes
   searchNotes(keyword: string): Observable<Note[]> {
     return this.apiService.get<Note[]>(`notes/search?keyword=${keyword}`);
@@ -69,4 +59,15 @@ export class NoteService {
   bulkDeleteNotes(noteIds: number[]): Observable<any> {
     return this.apiService.delete('notes/bulk', { noteIds });
   }
+
+  // Change note color
+  changeNoteColor(id: number, color: string): Observable<any> {
+    return this.apiService.patch(`notes/${id}/color`, { color });
+  }
+
+  // Update note
+  updateNote(id: number, note: { title: string; content: string }): Observable<any> {
+    return this.apiService.put(`notes/${id}`, note);
+  }
 }
+

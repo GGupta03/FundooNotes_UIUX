@@ -2,8 +2,10 @@ import { Component, HostListener, OnInit, Inject, PLATFORM_ID } from '@angular/c
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { NoteService } from '../../services/note.service';
 import { AuthService } from '../../services/auth.service';
+import { EditNoteDialogComponent, EditNoteData } from '../edit-note-dialog/edit-note-dialog.component';
 
 interface Note {
   id: number;
@@ -19,7 +21,7 @@ interface Note {
 @Component({
   selector: 'app-note-card',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatDialogModule],
   templateUrl: './note-card.component.html',
   styleUrl: './note-card.component.css'
 })
@@ -29,14 +31,23 @@ export class NoteCardComponent implements OnInit {
   description = '';
   selectedColor = '#ffffff';
   imagePreview: string | null = null;
+  showColorPalette = false;
+
   notes: Note[] = [];
   isLoading = false;
   errorMessage: string | null = null;
+
+  colors: string[] = [
+    '#ffffff', '#f28b82', '#fbbc04', '#fff475',
+    '#ccff90', '#a7ffeb', '#cbf0f8', '#aecbfa',
+    '#d7aefb', '#fdcfe8', '#e6c9a8', '#e8eaed'
+  ];
 
   constructor(
     private noteService: NoteService,
     private authService: AuthService,
     private router: Router,
+    private dialog: MatDialog,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
@@ -46,6 +57,15 @@ export class NoteCardComponent implements OnInit {
 
   expandBox(): void {
     this.isExpanded = true;
+  }
+
+  toggleColorPalette(): void {
+    this.showColorPalette = !this.showColorPalette;
+  }
+
+  selectColor(color: string): void {
+    this.selectedColor = color;
+    this.showColorPalette = false;
   }
 
   onImageSelected(event: any): void {
@@ -71,33 +91,19 @@ export class NoteCardComponent implements OnInit {
     if (this.title.trim() || this.description.trim()) {
       const noteData = {
         title: this.title,
-        content: this.description
+        content: this.description,
+        color: this.selectedColor
       };
 
       this.noteService.createNote(noteData).subscribe({
         next: (response) => {
-          console.log('Note created successfully:', response);
+          console.log('Note created successfully', response);
           this.loadNotes();
           this.resetForm();
         },
         error: (err) => {
-          console.error('Error creating note full response:', err);
-          console.error('Error status:', err.status);
-          console.error('Error message:', err.message);
-          console.error('Error error field:', err.error);
-          
-          let errorMsg = 'Failed to create note. Please try again.';
-          if (err.status === 0) {
-            errorMsg = 'Unable to connect to the server.';
-          } else if (err.status === 400) {
-            errorMsg = err.error?.message || 'Invalid note data. Please check your input.';
-          } else if (err.status === 401) {
-            errorMsg = 'Unauthorized. Please login again.';
-          } else if (err.status === 500) {
-            errorMsg = 'Server error: ' + (err.error?.message || 'Internal server error');
-          }
-          
-          alert(errorMsg);
+          console.error('Error creating note', err);
+          alert('Failed to create note. Please try again.');
         }
       });
     } else {
@@ -111,37 +117,31 @@ export class NoteCardComponent implements OnInit {
     this.description = '';
     this.selectedColor = '#ffffff';
     this.imagePreview = null;
+    this.showColorPalette = false;
   }
 
   loadNotes(): void {
     this.isLoading = true;
     this.errorMessage = null;
+
     this.noteService.getAllNotes().subscribe({
       next: (data: any) => {
-        console.log('Notes loaded:', data);
         this.notes = data.filter((note: any) => !note.isArchived);
         this.isLoading = false;
       },
       error: (err) => {
-        console.error('Error loading notes:', err);
+        console.error('Error loading notes', err);
         this.notes = [];
         this.isLoading = false;
-        
-        if (err.status === 0) {
-          this.errorMessage = 'Unable to connect to the server. Please ensure the backend is running.';
-        } else if (err.status === 401) {
+
+        if (err.status === 401) {
           this.errorMessage = 'Session expired. Please login again.';
-          // Automatically logout and redirect to login
           setTimeout(() => {
             this.authService.logout();
             this.router.navigate(['/login']);
           }, 2000);
-        } else if (err.status === 403) {
-          this.errorMessage = 'Access denied.';
-        } else if (err.status === 500) {
-          this.errorMessage = 'Server error. Please try again later.';
         } else {
-          this.errorMessage = `Error loading notes: ${err.statusText || 'Unknown error'}`;
+          this.errorMessage = 'Error loading notes. Please try again.';
         }
       }
     });
@@ -149,8 +149,59 @@ export class NoteCardComponent implements OnInit {
 
   editNote(note: Note, event: Event): void {
     event.stopPropagation();
-    console.log('Edit note:', note);
-    // TODO: Implement edit functionality
+    
+    const dialogRef = this.dialog.open(EditNoteDialogComponent, {
+      width: '600px',
+      maxWidth: '95vw',
+      panelClass: 'edit-note-dialog-panel',
+      data: {
+        id: note.id,
+        title: note.title,
+        content: note.content,
+        color: note.color || '#ffffff'
+      } as EditNoteData
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Update note with new data
+        this.updateNote(note.id, result);
+      }
+    });
+  }
+
+  updateNote(noteId: number, data: any): void {
+    const updateData = {
+      title: data.title,
+      content: data.content
+    };
+
+    this.noteService.updateNote(noteId, updateData).subscribe({
+      next: () => {
+        // If color changed, update color separately
+        if (data.color) {
+          this.changeNoteColor(noteId, data.color);
+        } else {
+          this.loadNotes();
+        }
+      },
+      error: (err) => {
+        console.error('Error updating note', err);
+        alert('Failed to update note. Please try again.');
+      }
+    });
+  }
+
+  changeNoteColor(noteId: number, color: string): void {
+    this.noteService.changeNoteColor(noteId, color).subscribe({
+      next: () => {
+        console.log('Color updated successfully');
+        this.loadNotes();
+      },
+      error: (err) => {
+        console.error('Error changing color', err);
+      }
+    });
   }
 
   archiveNote(noteId: number, event: Event): void {
@@ -160,7 +211,9 @@ export class NoteCardComponent implements OnInit {
         console.log('Note archived');
         this.loadNotes();
       },
-      error: (err) => console.error('Error archiving note:', err)
+      error: (err) => {
+        console.error('Error archiving note', err);
+      }
     });
   }
 
@@ -172,7 +225,9 @@ export class NoteCardComponent implements OnInit {
           console.log('Note deleted');
           this.loadNotes();
         },
-        error: (err) => console.error('Error deleting note:', err)
+        error: (err) => {
+          console.error('Error deleting note', err);
+        }
       });
     }
   }

@@ -1,9 +1,10 @@
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient, withInterceptors, HTTP_INTERCEPTORS, withXsrfConfiguration, withFetch } from '@angular/common/http';
+import { provideHttpClient, HTTP_INTERCEPTORS, withXsrfConfiguration, withFetch } from '@angular/common/http';
 import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { HttpConfigInterceptor } from './services/http.interceptor';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -21,6 +22,7 @@ export const appConfig: ApplicationConfig = {
       provide: HTTP_INTERCEPTORS,
       useClass: HttpConfigInterceptor,
       multi: true
-    }
+    },
+    provideAnimationsAsync()
   ]
 };
