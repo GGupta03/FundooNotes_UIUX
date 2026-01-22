@@ -67,7 +67,7 @@ export class NoteService {
 
   // Restore note from trash
   restoreNote(id: number): Observable<any> {
-    return this.apiService.patch(`notes/${id}/restore`, {});
+    return this.apiService.post(`notes/${id}/restore`, {});
   }
 
   // Permanently delete note
@@ -75,8 +75,8 @@ export class NoteService {
     return this.apiService.delete(`notes/${id}/permanent`);
   }
 
-  // Bulk permanent delete
-  bulkPermanentDelete(noteIds: number[]): Observable<any> {
-    return this.apiService.delete(`notes/bulk/permanent`, { noteIds });
+  // Empty trash (bulk permanent delete)
+  emptyTrash(): Observable<any> {
+    return this.apiService.delete(`notes/trash/empty`);
   }
 }

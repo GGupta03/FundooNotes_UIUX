@@ -30,7 +30,7 @@
 
   <!-- Trash Notes Grid -->
   <div class="notes-container" *ngIf="trashNotes && trashNotes.length > 0 && !isLoading">
-    <div class="notes-grid" [class.list-view]="!isGridView">
+    <div class="notes-grid">
       <div class="note-item" 
            *ngFor="let note of trashNotes" 
            [style.backgroundColor]="note.color || '#ffffff'">
