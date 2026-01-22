@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { NoteCardComponent } from '../note-card/note-card.component';
 
 @Component({
@@ -9,5 +9,11 @@ import { NoteCardComponent } from '../note-card/note-card.component';
   styleUrl: './notes.component.css'
 })
 export class NotesComponent {
+  @ViewChild('noteCard') noteCard!: NoteCardComponent;
 
+  setViewMode(isGridView: boolean): void {
+    if (this.noteCard) {
+      this.noteCard.isGridView = isGridView;
+    }
+  }
 }

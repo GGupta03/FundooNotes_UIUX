@@ -34,14 +34,21 @@ export class NoteCardComponent implements OnInit {
   showColorPalette = false;
   activeColorPaletteNoteId: number | null = null;
 
+  // Notes arrays
   notes: Note[] = [];
   pinnedNotes: Note[] = [];
   otherNotes: Note[] = [];
+
+  // Loading and error states
   isLoading = false;
   errorMessage: string | null = null;
 
+  // View mode: true = grid view (default), false = list view
+  isGridView = true;
+
+  // Color palette
   colors: string[] = [
-    '#ffffff', // Default white
+    '#ffffff', // Default (white)
     '#f28b82', // Red
     '#fbbc04', // Orange
     '#fff475', // Yellow
@@ -67,6 +74,12 @@ export class NoteCardComponent implements OnInit {
     this.loadNotes();
   }
 
+  // ==================== VIEW MODE ====================
+  toggleViewMode(gridView: boolean): void {
+    this.isGridView = gridView;
+  }
+
+  // ==================== CREATE NOTE ACTIONS ====================
   expandBox(): void {
     this.isExpanded = true;
   }
@@ -117,7 +130,7 @@ export class NoteCardComponent implements OnInit {
         next: (response: any) => {
           console.log('Note created successfully', response);
           
-          // Extract ID from response - handle both direct ID and nested response
+          // Extract ID from response
           let noteId = response.id || response.data?.id || response.noteId;
           
           // If color is not default white, update the color
@@ -167,10 +180,11 @@ export class NoteCardComponent implements OnInit {
     this.showColorPalette = false;
   }
 
+  // ==================== LOAD NOTES ====================
   loadNotes(): void {
     this.isLoading = true;
     this.errorMessage = null;
-
+    
     this.noteService.getAllNotes().subscribe({
       next: (data: any) => {
         this.notes = data.filter((note: any) => !note.isArchived);
@@ -187,7 +201,7 @@ export class NoteCardComponent implements OnInit {
         this.pinnedNotes = [];
         this.otherNotes = [];
         this.isLoading = false;
-
+        
         if (err.status === 401) {
           this.errorMessage = 'Session expired. Please login again.';
           setTimeout(() => {
@@ -201,6 +215,7 @@ export class NoteCardComponent implements OnInit {
     });
   }
 
+  // ==================== NOTE ACTIONS ====================
   editNote(note: Note, event: Event): void {
     event.stopPropagation();
     
@@ -232,6 +247,7 @@ export class NoteCardComponent implements OnInit {
     this.noteService.updateNote(noteId, updateData).subscribe({
       next: () => {
         console.log('Note updated successfully');
+        
         // Always update color if color is provided from dialog
         if (data.color) {
           this.changeNoteColorAndReload(noteId, data.color);
@@ -246,8 +262,8 @@ export class NoteCardComponent implements OnInit {
           this.router.navigate(['/login']);
         } else {
           alert('Failed to update note. Please try again.');
-          this.loadNotes();
         }
+        this.loadNotes();
       }
     });
   }
@@ -260,6 +276,7 @@ export class NoteCardComponent implements OnInit {
     this.noteService.changeNoteColor(noteId, color).subscribe({
       next: () => {
         console.log('Color updated successfully');
+        this.activeColorPaletteNoteId = null;
         this.loadNotes();
       },
       error: (err) => {
@@ -267,8 +284,6 @@ export class NoteCardComponent implements OnInit {
         if (err.status === 401) {
           this.authService.logout();
           this.router.navigate(['/login']);
-        } else {
-          this.loadNotes();
         }
       }
     });
@@ -276,6 +291,7 @@ export class NoteCardComponent implements OnInit {
 
   togglePin(noteId: number, event: Event): void {
     event.stopPropagation();
+    
     this.noteService.pinNote(noteId).subscribe({
       next: () => {
         console.log('Note pin status toggled');
@@ -289,6 +305,7 @@ export class NoteCardComponent implements OnInit {
 
   archiveNote(noteId: number, event: Event): void {
     event.stopPropagation();
+    
     this.noteService.archiveNote(noteId).subscribe({
       next: () => {
         console.log('Note archived');
@@ -302,6 +319,7 @@ export class NoteCardComponent implements OnInit {
 
   deleteNote(noteId: number, event: Event): void {
     event.stopPropagation();
+    
     if (confirm('Are you sure you want to delete this note? It will be moved to Trash.')) {
       this.noteService.deleteNote(noteId).subscribe({
         next: () => {
@@ -315,8 +333,8 @@ export class NoteCardComponent implements OnInit {
             this.router.navigate(['/login']);
           } else {
             alert('Failed to delete note. Please try again.');
-            this.loadNotes();
           }
+          this.loadNotes();
         }
       });
     }
@@ -331,6 +349,11 @@ export class NoteCardComponent implements OnInit {
     const target = event.target as HTMLElement;
     if (this.isExpanded && !target.closest('.create-note')) {
       this.saveAndClose();
+    }
+    
+    // Close color palette when clicking outside
+    if (this.activeColorPaletteNoteId !== null && !target.closest('.note-color-palette-container')) {
+      this.activeColorPaletteNoteId = null;
     }
   }
 }

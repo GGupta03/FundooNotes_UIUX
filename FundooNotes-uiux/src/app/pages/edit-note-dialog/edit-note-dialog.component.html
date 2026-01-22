@@ -1,4 +1,4 @@
-<div class="edit-dialog">
+<div class="edit-dialog" [style.backgroundColor]="selectedColor || '#ffffff'">
   <div class="dialog-header">
     <h2 mat-dialog-title>Edit Note</h2>
     <button class="close-icon-btn" (click)="onCancel()" type="button">
@@ -62,6 +62,7 @@
       </button>
     </div>
 
+    <!-- Changed from onSaveClose() to onSave() -->
     <button class="close-btn" type="button" (click)="onSave()">Close</button>
   </mat-dialog-actions>
 </div>

@@ -3,6 +3,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet, Router } from '@angular/rou
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
+import { ViewService } from '../../services/view.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -12,7 +13,20 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent {
-  constructor(private authService: AuthService, private router: Router) {}
+  isGridView = true;
+
+  constructor(
+    private authService: AuthService, 
+    private router: Router,
+    private viewService: ViewService
+  ) {
+    this.isGridView = this.viewService.isGridView();
+  }
+
+  toggleGridView(): void {
+    this.viewService.toggleGridView();
+    this.isGridView = !this.isGridView;
+  }
 
   onLogout(): void {
     this.authService.logout();

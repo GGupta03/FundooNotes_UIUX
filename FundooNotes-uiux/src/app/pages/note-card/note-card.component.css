@@ -12,15 +12,13 @@
   background: #ffffff;
   border-radius: 8px;
   padding: 12px 16px;
-  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3),
-              0 2px 6px 2px rgba(60, 64, 67, 0.15);
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 2px 6px 2px rgba(60, 64, 67, 0.15);
   transition: box-shadow 0.2s, padding 0.2s;
   cursor: text;
 }
 
 .create-note:hover {
-  box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.3),
-              0 4px 8px 3px rgba(60, 64, 67, 0.15);
+  box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
 }
 
 .create-note.expanded {
@@ -206,8 +204,7 @@
   background: #ffffff;
   border-radius: 8px;
   padding: 8px;
-  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3),
-              0 2px 6px 2px rgba(60, 64, 67, 0.15);
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 2px 6px 2px rgba(60, 64, 67, 0.15);
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 4px;
@@ -257,7 +254,7 @@
   color: #5f6368;
   letter-spacing: 0.8px;
   margin: 16px 0 8px 0;
-  padding: 0 0 8px 0;
+  padding: 0;
   text-transform: uppercase;
 }
 
@@ -340,19 +337,23 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
-/* Notes Grid - Masonry Layout like Google Keep */
+/* ✅ CORRECT: Notes Grid - Side by Side Layout */
 .notes-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 16px;
   padding: 16px 0;
 }
 
-/* Note Item */
+/* Note Item - Fixed Width for Side by Side */
 .note-item {
   background: #ffffff;
   border: 1px solid #e0e0e0;
@@ -361,14 +362,15 @@
   transition: box-shadow 0.2s, border-color 0.2s;
   cursor: pointer;
   position: relative;
-  min-height: 100px;
   display: flex;
   flex-direction: column;
+  width: calc(33.333% - 11px);
+  min-height: 100px;
+  box-sizing: border-box;
 }
 
 .note-item:hover {
-  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3),
-              0 2px 6px 2px rgba(60, 64, 67, 0.15);
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 2px 6px 2px rgba(60, 64, 67, 0.15);
 }
 
 .note-item:hover .note-footer-hover {
@@ -429,6 +431,7 @@
   margin: 0;
   word-wrap: break-word;
   letter-spacing: 0.2px;
+  white-space: pre-wrap;
 }
 
 /* Note Footer Hover */
@@ -466,6 +469,7 @@
   text-align: center;
   padding: 80px 20px;
   color: #5f6368;
+  width: 100%;
 }
 
 .empty-icon {
@@ -481,37 +485,7 @@
   color: #5f6368;
 }
 
-/* Section Title */
-.section-title {
-  margin: 32px 0 16px 0;
-  padding: 0 0 8px 0;
-  font-size: 12px;
-  font-weight: 500;
-  color: #5f6368;
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
-}
-
-.notes-container > div:first-of-type .section-title {
-  margin-top: 24px;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .notes-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 12px;
-  }
-
-  .create-note {
-    margin: 16px 12px;
-  }
-
-  .color-palette {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-/* Note Color Palette (in footer) */
+/* Note Color Palette in footer */
 .note-color-palette-container {
   position: relative;
   display: inline-block;
@@ -524,8 +498,7 @@
   background: #ffffff;
   border-radius: 8px;
   padding: 6px;
-  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3),
-              0 2px 6px 2px rgba(60, 64, 67, 0.15);
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 2px 6px 2px rgba(60, 64, 67, 0.15);
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 2px;
@@ -560,8 +533,34 @@
   color: rgba(0, 0, 0, 0.87);
   font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20;
 }
-@media (max-width: 480px) {
+
+/* ✅ Responsive Design */
+@media (max-width: 1280px) {
+  .note-item {
+    width: calc(33.333% - 11px);
+  }
+}
+
+@media (max-width: 960px) {
   .notes-grid {
-    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .note-item {
+    width: calc(50% - 6px);
+  }
+  
+  .create-note {
+    margin: 16px 12px;
+  }
+  
+  .color-palette {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .note-item {
+    width: 100%;
   }
 }

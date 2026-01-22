@@ -191,6 +191,7 @@
 /* CONTENT */
 .content {
   flex: 1;
+  width : 100vw;
   background: #f1f3f4;
   padding-top: 28px;
   display: flex;

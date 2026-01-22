@@ -111,11 +111,11 @@
     <div class="spinner"></div>
     <p>Loading notes...</p>
   </div>
-
+  
   <!-- Pinned Notes Section -->
   <div *ngIf="pinnedNotes && pinnedNotes.length > 0 && !isLoading">
     <h3 class="section-title">PINNED</h3>
-    <div class="notes-grid">
+    <div class="notes-grid" [class.list-view]="!isGridView">
       <div 
         class="note-item" 
         *ngFor="let note of pinnedNotes" 
@@ -179,7 +179,7 @@
   <!-- Other Notes Section -->
   <div *ngIf="otherNotes && otherNotes.length > 0 && !isLoading">
     <h3 class="section-title" *ngIf="pinnedNotes && pinnedNotes.length > 0">OTHERS</h3>
-    <div class="notes-grid">
+    <div class="notes-grid" [class.list-view]="!isGridView">
       <div 
         class="note-item" 
         *ngFor="let note of otherNotes" 

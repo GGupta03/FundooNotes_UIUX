@@ -24,8 +24,15 @@
         <span class="material-symbols-outlined">refresh</span>
       </button>
 
-      <button class="circle-btn" type="button">
-        <span class="material-symbols-outlined">view_agenda</span>
+      <button 
+        class="circle-btn" 
+        type="button"
+        (click)="toggleGridView()"
+        [title]="isGridView ? 'Switch to list view' : 'Switch to grid view'"
+      >
+        <span class="material-symbols-outlined">
+          {{ isGridView ? 'view_agenda' : 'dashboard' }}
+        </span>
       </button>
 
       <button class="circle-btn" type="button">
