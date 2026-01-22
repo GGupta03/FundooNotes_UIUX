@@ -18,7 +18,7 @@ export class ViewService {
     this.gridViewSubject.next(isGridView);
   }
 
-  isGridView(): boolean {
+  get isGridView(): boolean {
     return this.gridViewSubject.value;
   }
 }

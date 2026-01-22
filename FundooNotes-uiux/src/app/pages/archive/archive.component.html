@@ -1,4 +1,80 @@
-<div class="empty-wrapper">
-  <span class="material-symbols-outlined empty-icon">archive</span>
-  <p class="empty-text">Your archived notes appear here</p>
+<div class="archive-page">
+  <!-- Error message alert -->
+  <div class="error-alert" *ngIf="errorMessage">
+    <div class="error-content">
+      <span class="material-symbols-outlined error-icon">error</span>
+      <div class="error-text"><strong>Error:</strong> {{ errorMessage }}</div>
+    </div>
+    <div class="error-actions">
+      <button class="retry-btn" (click)="loadArchivedNotes()" *ngIf="!errorMessage.includes('Session expired')">Retry</button>
+      <button class="login-btn" (click)="goToLogin()" *ngIf="errorMessage.includes('Session expired')">Go to Login</button>
+    </div>
+  </div>
+
+  <!-- Loading indicator -->
+  <div class="loading-indicator" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading archived notes...</p>
+  </div>
+
+  <!-- Archived Notes Grid -->
+  <div *ngIf="archivedNotes && archivedNotes.length > 0 && !isLoading">
+    <div class="notes-grid" [class.list-view]="!isGridView">
+      <div class="note-item" *ngFor="let note of archivedNotes" 
+           [style.backgroundColor]="note.color || '#ffffff'"
+           (click)="editNote(note, $event)">
+        
+        <!-- Note content -->
+        <div class="note-content">
+          <h3 class="note-title" *ngIf="note.title && note.title.trim()">{{ note.title }}</h3>
+          <p class="note-description" *ngIf="note.content">{{ note.content }}</p>
+        </div>
+
+        <!-- Note footer visible on hover -->
+        <div class="note-footer-hover">
+          <span class="material-symbols-outlined icon-btn-small" 
+                (click)="$event.stopPropagation()" 
+                title="Remind me">add_alert</span>
+          <span class="material-symbols-outlined icon-btn-small" 
+                (click)="$event.stopPropagation()" 
+                title="Collaborator">person_add</span>
+          
+          <!-- Color palette for note -->
+          <div class="note-color-palette-container">
+            <span class="material-symbols-outlined icon-btn-small" 
+                  (click)="toggleNotePalette(note.id, $event)" 
+                  title="Background options">palette</span>
+            <div class="note-color-palette" 
+                 *ngIf="activeColorPaletteNoteId === note.id" 
+                 (click)="$event.stopPropagation()">
+              <div *ngFor="let color of colors" 
+                   class="color-option-small" 
+                   [style.backgroundColor]="color"
+                   [class.selected]="note.color === color"
+                   (click)="changeNoteColor(note.id, color, $event)"
+                   [title]="color === '#ffffff' ? 'Default' : 'Color'">
+                <span class="material-symbols-outlined check-icon-small" *ngIf="note.color === color">check</span>
+              </div>
+            </div>
+          </div>
+
+          <span class="material-symbols-outlined icon-btn-small" 
+                (click)="$event.stopPropagation()" 
+                title="Add image">image</span>
+          <span class="material-symbols-outlined icon-btn-small" 
+                (click)="unarchiveNote(note.id, $event)" 
+                title="Unarchive">unarchive</span>
+          <span class="material-symbols-outlined icon-btn-small" 
+                (click)="deleteNote(note.id, $event)" 
+                title="Delete">delete</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div class="empty-wrapper" *ngIf="(!archivedNotes || archivedNotes.length === 0) && !isLoading && !errorMessage">
+    <span class="material-symbols-outlined empty-icon">archive</span>
+    <p class="empty-text">Your archived notes appear here</p>
+  </div>
 </div>

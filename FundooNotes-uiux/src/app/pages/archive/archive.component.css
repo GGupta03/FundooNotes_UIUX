@@ -1,3 +1,141 @@
+.archive-page {
+  width: 100%;
+  padding: 0 16px;
+  margin-top: 30px;
+}
+
+/* Notes grid layout */
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+  max-width: 1280px;
+}
+
+/* List view */
+.notes-grid.list-view {
+  grid-template-columns: 1fr;
+  max-width: 600px;
+}
+
+/* Note card */
+.note-item {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+  position: relative;
+}
+
+.note-item:hover {
+  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3), 0 2px 6px rgba(60, 64, 67, 0.15);
+}
+
+.note-item:hover .note-footer-hover {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Note content */
+.note-content {
+  margin-bottom: 8px;
+}
+
+.note-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #202124;
+  margin: 0 0 8px 0;
+  word-wrap: break-word;
+}
+
+.note-description {
+  font-size: 14px;
+  color: #202124;
+  margin: 0;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+/* Note footer (hover actions) */
+.note-footer-hover {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+  margin-top: 4px;
+}
+
+.icon-btn-small {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  color: #5f6368;
+  transition: background-color 0.2s;
+}
+
+.icon-btn-small:hover {
+  background-color: rgba(95, 99, 104, 0.157);
+}
+
+/* Color palette */
+.note-color-palette-container {
+  position: relative;
+}
+
+.note-color-palette {
+  position: absolute;
+  bottom: 35px;
+  left: 0;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 8px;
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 2px 6px 2px rgba(60, 64, 67, 0.15);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  z-index: 1000;
+}
+
+.color-option-small {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+.color-option-small:hover {
+  transform: scale(1.1);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+.color-option-small.selected {
+  border-color: rgba(0, 0, 0, 0.87);
+  border-width: 2px;
+}
+
+.check-icon-small {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.87);
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+}
+
+/* Empty state */
 .empty-wrapper {
   margin-top: 150px;
   display: flex;
@@ -14,4 +152,83 @@
 .empty-text {
   margin-top: 18px;
   font-size: 24px;
+}
+
+/* Loading indicator */
+.loading-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 100px;
+  color: #5f6368;
+}
+
+.spinner {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #1a73e8;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Error alert */
+.error-alert {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 4px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.error-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.error-icon {
+  color: #ff9800;
+  font-size: 24px;
+}
+
+.error-text {
+  color: #856404;
+}
+
+.error-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.retry-btn, .login-btn {
+  background: #1a73e8;
+  color: white;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.retry-btn:hover, .login-btn:hover {
+  background: #1557b0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .notes-grid {
+    grid-template-columns: 1fr;
+  }
 }

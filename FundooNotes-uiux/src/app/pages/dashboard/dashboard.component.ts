@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
@@ -12,20 +12,27 @@ import { ViewService } from '../../services/view.service';
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
-export class DashboardComponent {
-  isGridView = true;
+export class DashboardComponent implements OnInit {
+  isGridView: boolean = true;
 
   constructor(
-    private authService: AuthService, 
+    private authService: AuthService,
     private router: Router,
     private viewService: ViewService
-  ) {
-    this.isGridView = this.viewService.isGridView();
+  ) {}
+
+  ngOnInit(): void {
+    // Get initial value
+    this.isGridView = this.viewService.isGridView;
+    
+    // Subscribe to changes
+    this.viewService.gridView$.subscribe((isGrid: boolean) => {
+      this.isGridView = isGrid;
+    });
   }
 
   toggleGridView(): void {
     this.viewService.toggleGridView();
-    this.isGridView = !this.isGridView;
   }
 
   onLogout(): void {
