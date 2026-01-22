@@ -242,9 +242,10 @@
 
 /* Notes Container */
 .notes-container {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 16px;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0 8px;
 }
 
 /* Section Title */
