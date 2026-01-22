@@ -1,7 +1,65 @@
 <div class="trash-page">
-  <div class="trash-info">Notes in Trash are deleted after 7 days.</div>
+  <!-- Header with Empty Trash button -->
+  <div class="trash-header" *ngIf="trashNotes && trashNotes.length > 0 && !isLoading">
+    <div class="trash-info">Notes in Trash are deleted after 7 days.</div>
+    <button class="empty-trash-btn" (click)="emptyTrash()" type="button">
+      Empty Trash
+    </button>
+  </div>
 
-  <div class="empty-wrapper">
+  <!-- Info text when empty -->
+  <div class="trash-info" *ngIf="(!trashNotes || trashNotes.length === 0) && !isLoading">
+    Notes in Trash are deleted after 7 days.
+  </div>
+
+  <!-- Loading indicator -->
+  <div class="loading-indicator" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading trash notes...</p>
+  </div>
+
+  <!-- Error message -->
+  <div class="error-alert" *ngIf="errorMessage">
+    <div class="error-content">
+      <span class="material-symbols-outlined error-icon">error</span>
+      <div class="error-text">
+        <strong>Error:</strong> {{ errorMessage }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Trash Notes Grid -->
+  <div class="notes-container" *ngIf="trashNotes && trashNotes.length > 0 && !isLoading">
+    <div class="notes-grid" [class.list-view]="!isGridView">
+      <div class="note-item" 
+           *ngFor="let note of trashNotes" 
+           [style.backgroundColor]="note.color || '#ffffff'">
+        
+        <!-- Note content -->
+        <div class="note-content">
+          <h3 class="note-title" *ngIf="note.title && note.title.trim()">{{ note.title }}</h3>
+          <p class="note-description" *ngIf="note.content">{{ note.content }}</p>
+        </div>
+
+        <!-- Note footer with actions -->
+        <div class="note-footer-trash">
+          <span class="material-symbols-outlined icon-btn-small" 
+                (click)="restoreNote(note.id, $event)" 
+                title="Restore">
+            restore_from_trash
+          </span>
+          <span class="material-symbols-outlined icon-btn-small" 
+                (click)="permanentDeleteNote(note.id, $event)" 
+                title="Delete forever">
+            delete_forever
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div class="empty-wrapper" *ngIf="(!trashNotes || trashNotes.length === 0) && !isLoading && !errorMessage">
     <span class="material-symbols-outlined empty-icon">delete</span>
     <p class="empty-text">No notes in Trash</p>
   </div>

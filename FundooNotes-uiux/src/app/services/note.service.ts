@@ -10,7 +10,7 @@ export class NoteService {
 
   // Get all notes
   getAllNotes(): Observable<any> {
-    return this.apiService.get('notes');
+    return this.apiService.get(`notes`);
   }
 
   // Get note by ID
@@ -20,7 +20,7 @@ export class NoteService {
 
   // Create note
   createNote(note: { title: string; content: string }): Observable<any> {
-    return this.apiService.post('notes', note);
+    return this.apiService.post(`notes`, note);
   }
 
   // Update note
@@ -28,7 +28,7 @@ export class NoteService {
     return this.apiService.put(`notes/${id}`, note);
   }
 
-  // Delete note
+  // Delete note (move to trash)
   deleteNote(id: number): Observable<any> {
     return this.apiService.delete(`notes/${id}`);
   }
@@ -55,6 +55,28 @@ export class NoteService {
 
   // Bulk delete
   bulkDeleteNotes(noteIds: number[]): Observable<any> {
-    return this.apiService.delete('notes/bulk', { noteIds });
+    return this.apiService.delete(`notes/bulk`, { noteIds });
+  }
+
+  // ===== TRASH OPERATIONS =====
+  
+  // Get trash notes
+  getTrashNotes(): Observable<any> {
+    return this.apiService.get(`notes/trash`);
+  }
+
+  // Restore note from trash
+  restoreNote(id: number): Observable<any> {
+    return this.apiService.patch(`notes/${id}/restore`, {});
+  }
+
+  // Permanently delete note
+  permanentDeleteNote(id: number): Observable<any> {
+    return this.apiService.delete(`notes/${id}/permanent`);
+  }
+
+  // Bulk permanent delete
+  bulkPermanentDelete(noteIds: number[]): Observable<any> {
+    return this.apiService.delete(`notes/bulk/permanent`, { noteIds });
   }
 }

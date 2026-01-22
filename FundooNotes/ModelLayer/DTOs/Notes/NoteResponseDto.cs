@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ModelLayer.DTOs.Notes
 {
@@ -12,6 +10,8 @@ namespace ModelLayer.DTOs.Notes
         public string Color { get; set; }
         public bool IsPinned { get; set; }
         public bool IsArchived { get; set; }
+        public bool IsDeleted { get; set; }
+        public DateTime? DeletedAt { get; set; } // ADD THIS
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
     }

@@ -25,6 +25,8 @@ namespace BusinessLayer.Services
                 Color = n.Color,
                 IsPinned = n.IsPinned,
                 IsArchived = n.IsArchived,
+                IsDeleted = n.IsDeleted,
+                DeletedAt = n.DeletedAt,
                 CreatedAt = n.CreatedAt,
                 UpdatedAt = n.UpdatedAt
             }).ToList();
@@ -43,6 +45,8 @@ namespace BusinessLayer.Services
                 Color = note.Color,
                 IsPinned = note.IsPinned,
                 IsArchived = note.IsArchived,
+                IsDeleted = note.IsDeleted,
+                DeletedAt = note.DeletedAt,
                 CreatedAt = note.CreatedAt,
                 UpdatedAt = note.UpdatedAt
             };
@@ -52,9 +56,11 @@ namespace BusinessLayer.Services
         {
             var note = new Note
             {
-                Title = dto.Title,
-                Content = dto.Content,
-                UserId = userId
+                Title = dto.Title ?? string.Empty,
+                Content = dto.Content ?? string.Empty,
+                UserId = userId,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
             };
 
             await noteRepo.AddAsync(note);
@@ -67,6 +73,8 @@ namespace BusinessLayer.Services
                 Color = note.Color,
                 IsPinned = note.IsPinned,
                 IsArchived = note.IsArchived,
+                IsDeleted = note.IsDeleted,
+                DeletedAt = note.DeletedAt,
                 CreatedAt = note.CreatedAt,
                 UpdatedAt = note.UpdatedAt
             };
@@ -77,8 +85,8 @@ namespace BusinessLayer.Services
             var note = await noteRepo.GetByIdAsync(noteId, userId)
                 ?? throw new Exception("Note not found");
 
-            note.Title = dto.Title;
-            note.Content = dto.Content;
+            note.Title = dto.Title ?? note.Title;
+            note.Content = dto.Content ?? note.Content;
             note.UpdatedAt = DateTime.UtcNow;
 
             await noteRepo.UpdateAsync(note);
@@ -104,6 +112,8 @@ namespace BusinessLayer.Services
                 Color = n.Color,
                 IsPinned = n.IsPinned,
                 IsArchived = n.IsArchived,
+                IsDeleted = n.IsDeleted,
+                DeletedAt = n.DeletedAt,
                 CreatedAt = n.CreatedAt,
                 UpdatedAt = n.UpdatedAt
             }).ToList();
@@ -154,9 +164,8 @@ namespace BusinessLayer.Services
             }
         }
 
-        // ==================== NEW TRASH METHODS ====================
+        // ==================== TRASH METHODS ====================
 
-        // Get all trashed notes
         public async Task<List<NoteResponseDto>> GetTrashedAsync(int userId)
         {
             var notes = await noteRepo.GetTrashedAsync(userId);
@@ -168,23 +177,22 @@ namespace BusinessLayer.Services
                 Color = n.Color,
                 IsPinned = n.IsPinned,
                 IsArchived = n.IsArchived,
+                IsDeleted = n.IsDeleted,
+                DeletedAt = n.DeletedAt,
                 CreatedAt = n.CreatedAt,
                 UpdatedAt = n.UpdatedAt
             }).ToList();
         }
 
-        // Restore note from trash
         public async Task RestoreAsync(int noteId, int userId)
         {
-            // Find in trash (include deleted notes)
-            var note = await noteRepo.GetTrashedAsync(userId);
-            var trashedNote = note.FirstOrDefault(n => n.Id == noteId)
+            var notes = await noteRepo.GetTrashedAsync(userId);
+            var trashedNote = notes.FirstOrDefault(n => n.Id == noteId)
                 ?? throw new Exception("Note not found in trash");
 
             await noteRepo.RestoreAsync(trashedNote);
         }
 
-        // Permanently delete note
         public async Task DeletePermanentlyAsync(int noteId, int userId)
         {
             var notes = await noteRepo.GetTrashedAsync(userId);
@@ -194,7 +202,6 @@ namespace BusinessLayer.Services
             await noteRepo.DeleteAsync(note); // Hard delete
         }
 
-        // Empty entire trash
         public async Task EmptyTrashAsync(int userId)
         {
             var trashedNotes = await noteRepo.GetTrashedAsync(userId);

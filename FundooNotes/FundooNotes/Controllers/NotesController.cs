@@ -142,14 +142,14 @@ namespace FundooNotes.Controllers
         public async Task<IActionResult> ChangeColor(int id, [FromBody] ChangeColorDto dto)
         {
             await noteService.ChangeColorAsync(id, dto.Color, GetUserId());
-            return Ok("Color updated");
+            return Ok(new { message = "Color updated" });
         }
 
         [HttpDelete("bulk")]
         public async Task<IActionResult> BulkDelete([FromBody] BulkDeleteDto dto)
         {
             await noteService.BulkDeleteAsync(dto.NoteIds, GetUserId());
-            return Ok("Notes moved to trash");
+            return Ok(new { message = "Notes moved to trash" });
         }
 
         // ==================== TRASH OPERATIONS ====================
@@ -199,6 +199,24 @@ namespace FundooNotes.Controllers
             }
         }
 
+        // Bulk permanent delete
+        [HttpDelete("bulk/permanent")]
+        public async Task<IActionResult> BulkPermanentDelete([FromBody] BulkDeleteDto dto)
+        {
+            try
+            {
+                foreach (var noteId in dto.NoteIds)
+                {
+                    await noteService.DeletePermanentlyAsync(noteId, GetUserId());
+                }
+                return Ok(new { message = "Notes permanently deleted successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = $"Error permanently deleting notes: {ex.Message}" });
+            }
+        }
+
         // Empty entire trash
         [HttpDelete("trash/empty")]
         public async Task<IActionResult> EmptyTrash()
@@ -220,14 +238,14 @@ namespace FundooNotes.Controllers
         public async Task<IActionResult> AddLabelToNote(int noteId, int labelId)
         {
             await noteLabelService.AddLabelToNoteAsync(noteId, labelId, GetUserId());
-            return Ok("Label added to note");
+            return Ok(new { message = "Label added to note" });
         }
 
         [HttpDelete("{noteId}/labels/{labelId}")]
         public async Task<IActionResult> RemoveLabelFromNote(int noteId, int labelId)
         {
             await noteLabelService.RemoveLabelFromNoteAsync(noteId, labelId, GetUserId());
-            return Ok("Label removed from note");
+            return Ok(new { message = "Label removed from note" });
         }
     }
 }
