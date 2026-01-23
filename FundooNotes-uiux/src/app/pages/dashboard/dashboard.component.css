@@ -201,3 +201,34 @@
   max-width: 1280px;
   margin: 0 16px;
 }
+/* Existing styles remain the same, add these: */
+
+.labels-divider {
+  height: 1px;
+  background: #dadce0;
+  margin: 8px 16px;
+}
+
+.labels-section {
+  margin: 8px 0;
+}
+
+.labels-header {
+  font-size: 11px;
+  font-weight: 500;
+  color: #5f6368;
+  padding: 8px 24px;
+  letter-spacing: 0.8px;
+}
+
+.label-item {
+  padding-left: 24px;
+}
+
+.side-item:not([routerLink]) {
+  cursor: pointer;
+}
+
+.side-item:not([routerLink]):hover {
+  background: #f1f3f4;
+}

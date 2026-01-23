@@ -1,23 +1,70 @@
-<div class="modal-overlay">
-  <div class="modal-box">
-
+<div class="modal-overlay" (click)="close()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
     <div class="modal-title">Edit labels</div>
 
+    <!-- Create New Label -->
     <div class="modal-row">
-      <button class="icon-btn" type="button">
+      <button class="icon-btn" type="button" (click)="newLabelName = ''">
         <span class="material-symbols-outlined">close</span>
       </button>
-
-      <input class="label-input" type="text" placeholder="Create new label" />
-
-      <button class="icon-btn" type="button">
+      <input 
+        class="label-input" 
+        type="text" 
+        placeholder="Create new label"
+        [(ngModel)]="newLabelName"
+        (keyup.enter)="createLabel()"
+      />
+      <button 
+        class="icon-btn" 
+        type="button" 
+        (click)="createLabel()"
+        [disabled]="!newLabelName.trim()"
+      >
         <span class="material-symbols-outlined">check</span>
       </button>
     </div>
 
-    <div class="modal-footer">
-      <button class="done-btn" type="button">Done</button>
+    <!-- Existing Labels -->
+    <div *ngFor="let label of labels" class="modal-row">
+      <button class="icon-btn" type="button" (click)="deleteLabel(label.id)">
+        <span class="material-symbols-outlined">delete</span>
+      </button>
+      
+      <input 
+        *ngIf="editingLabel?.id === label.id; else viewMode"
+        class="label-input" 
+        type="text" 
+        [(ngModel)]="editingLabel!.name"
+        (keyup.enter)="saveLabel()"
+        (blur)="saveLabel()"
+      />
+      
+      <ng-template #viewMode>
+        <div class="label-name" (click)="startEdit(label)">
+          {{ label.name }}
+        </div>
+      </ng-template>
+
+      <button 
+        *ngIf="editingLabel?.id === label.id"
+        class="icon-btn" 
+        type="button" 
+        (click)="saveLabel()"
+      >
+        <span class="material-symbols-outlined">check</span>
+      </button>
+      <button 
+        *ngIf="editingLabel?.id !== label.id"
+        class="icon-btn" 
+        type="button" 
+        (click)="startEdit(label)"
+      >
+        <span class="material-symbols-outlined">edit</span>
+      </button>
     </div>
 
+    <div class="modal-footer">
+      <button class="done-btn" type="button" (click)="close()">Done</button>
+    </div>
   </div>
 </div>

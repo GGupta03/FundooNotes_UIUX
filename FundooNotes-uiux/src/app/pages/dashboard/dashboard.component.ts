@@ -4,6 +4,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { ViewService } from '../../services/view.service';
+import { MatDialog } from '@angular/material/dialog';
+import { EditLabelsComponent } from '../edit-labels/edit-labels.component';
+import { LabelService, Label } from '../../services/label.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -14,11 +17,14 @@ import { ViewService } from '../../services/view.service';
 })
 export class DashboardComponent implements OnInit {
   isGridView: boolean = true;
+  labels: Label[] = [];
 
   constructor(
     private authService: AuthService,
     private router: Router,
-    private viewService: ViewService
+    private viewService: ViewService,
+    private dialog: MatDialog,
+    private labelService: LabelService
   ) {}
 
   ngOnInit(): void {
@@ -28,6 +34,29 @@ export class DashboardComponent implements OnInit {
     // Subscribe to changes
     this.viewService.gridView$.subscribe((isGrid: boolean) => {
       this.isGridView = isGrid;
+    });
+
+    // Load labels
+    this.loadLabels();
+  }
+
+  loadLabels(): void {
+    this.labelService.labels$.subscribe((labels: Label[]) => {
+      this.labels = labels;
+    });
+    this.labelService.getLabels().subscribe();
+  }
+
+  openEditLabels(): void {
+    const dialogRef = this.dialog.open(EditLabelsComponent, {
+      width: '300px',
+      panelClass: 'edit-labels-dialog',
+      disableClose: false,
+      hasBackdrop: true
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      this.loadLabels();
     });
   }
 

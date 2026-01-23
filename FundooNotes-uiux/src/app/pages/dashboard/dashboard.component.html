@@ -72,10 +72,29 @@
         <span class="label">Reminders</span>
       </a>
 
-      <a routerLink="/dashboard/edit-labels" routerLinkActive="active" class="side-item">
+      <!-- Edit Labels - Opens Dialog -->
+      <div class="side-item" (click)="openEditLabels()" style="cursor: pointer;">
         <span class="material-symbols-outlined">edit</span>
         <span class="label">Edit labels</span>
-      </a>
+      </div>
+
+      <!-- Labels Section -->
+      <div class="labels-divider" *ngIf="labels.length > 0"></div>
+      
+      <div class="labels-section" *ngIf="labels.length > 0">
+        <div class="labels-header">LABELS</div>
+        <a 
+          *ngFor="let label of labels" 
+          [routerLink]="['/dashboard/label', label.id]" 
+          routerLinkActive="active" 
+          class="side-item label-item"
+        >
+          <span class="material-symbols-outlined">label</span>
+          <span class="label">{{ label.name }}</span>
+        </a>
+      </div>
+
+      <div class="labels-divider" *ngIf="labels.length > 0"></div>
 
       <a routerLink="/dashboard/archive" routerLinkActive="active" class="side-item">
         <span class="material-symbols-outlined">archive</span>
